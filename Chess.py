@@ -203,7 +203,12 @@ class Vua(Piece):
         self.firstMove = False
         return
     def Castle(self,col):
-        print("Nhap thanh " + (self.row,self.col) + " " +  col)
+        if(col == 0):
+            self.move((self.row,self.col-2))
+            self.chess.chess[self.row][col].move((self.row,self.col+1))
+        elif(col ==7):
+            self.move((self.row,self.col+2))
+            self.chess.chess[self.row][col].move((self.row,self.col-1))
     def checkCastle(self,result:list, col: int):
         if(self.chess.chess[self.row][col] == None):
             return
@@ -297,15 +302,20 @@ class Chess:
             print()
 chess = Chess()
 chess.printChess()
-chess.chess[0][1].move((5,3))
-chess.chess[0][2].move((5,3))
-chess.chess[0][3].move((5,3))
-chess.chess[0][5].move((5,3))
-chess.chess[0][6].move((5,3))
-chess.chess[7][1].move((5,3))
-chess.chess[7][2].move((5,3))
-chess.chess[7][3].move((5,3))
-chess.chess[7][5].move((5,3))
-chess.chess[7][6].move((5,3))
-chess.printChess()
-print(chess.chess[7][4].possibleMove())
+# chess.chess[0][1].move((5,3))
+# chess.chess[0][2].move((5,3))
+# chess.chess[0][3].move((5,3))
+# chess.chess[0][5].move((5,3))
+# chess.chess[0][6].move((5,3))
+# chess.chess[7][1].move((5,3))
+# chess.chess[7][2].move((5,3))
+# chess.chess[7][3].move((5,3))
+# chess.chess[7][5].move((5,3))
+# chess.chess[7][6].move((5,3))
+# # chess.printChess()
+# a = chess.chess[7][4].possibleMove()
+# # print(chess.chess[7][4].possibleMove())
+# chess.chess[7][4].move(a[3])
+# chess.printChess()
+# print(chess.chess[7][6].possibleMove())
+
