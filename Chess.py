@@ -1,4 +1,5 @@
 from enum import Enum
+from agent import Agent
 MAX_ROW =8
 MAX_COL =8
 def unique(needList : list):
@@ -33,11 +34,13 @@ class Board:
                 else:
                     self.board[i].append(Cell(CellValue.BLACK, i, j))
 class Piece:
-    def __init__(self, team: Team, chess:Chess = None, row=None, col=None):
+    def __init__(self, team: Team, chess: Chess = None, row=None, col=None):
         self.team = team
         self.row = row
         self.col = col
         self.chess = chess
+
+    
     def possibleMove(self):
         print("Nothing")
     def checkPossibleMove(self,row:int,col:int):
@@ -166,7 +169,7 @@ class Rook(Piece):
     def move(self,row_col):
         super().move(row_col)
         self.firstMove = False
-class Vua(Piece):
+class King(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
         self.firstMove = True
@@ -238,9 +241,13 @@ class Queen(Piece):
         self.autoCheck(result,self.row,self.col,0,-1)
         return unique(result)
 class Chess:
-    def __init__(self):
+    
+    def __init__(self, player0: Agent, player1: Agent):
         self.initChess()
         self.board = Board()
+        self.playerTurn = 0
+        self.player0 = player0 #player who use white chess
+        self.player1 = player1 #player who use black chess
     def initChess(self):
         self.chess = []
         for i in range(8):
@@ -252,7 +259,7 @@ class Chess:
         self.addChess(Knight(Team.BLACK),0,1)
         self.addChess(Bishop(Team.BLACK),0,2)
         self.addChess(Queen(Team.BLACK),0,3)
-        self.addChess(Vua(Team.BLACK),0,4)
+        self.addChess(King(Team.BLACK),0,4)
         self.addChess(Bishop(Team.BLACK),0,5)
         self.addChess(Knight(Team.BLACK),0,6)
         self.addChess(Rook(Team.BLACK),0,7)
@@ -270,7 +277,7 @@ class Chess:
         self.addChess(Knight(Team.WHITE),7,1)
         self.addChess(Bishop(Team.WHITE),7,2)
         self.addChess(Queen(Team.WHITE),7,3)
-        self.addChess(Vua(Team.WHITE),7,4)
+        self.addChess(King(Team.WHITE),7,4)
         self.addChess(Bishop(Team.WHITE),7,5)
         self.addChess(Knight(Team.WHITE),7,6)
         self.addChess(Rook(Team.WHITE),7,7)
@@ -283,7 +290,7 @@ class Chess:
         self.addChess(Pawn(Team.WHITE),6,5)
         self.addChess(Pawn(Team.WHITE),6,6)
         self.addChess(Pawn(Team.WHITE),6,7)
-    def addChess(self,piece: Piece, row: int, col:int):
+    def addChess(self, piece: Piece, row: int, col:int):
         piece
         self.chess[row][col] = piece
         piece.row = row
@@ -300,8 +307,26 @@ class Chess:
                 else:
                     print("___", end=" ", flush=True)
             print()
-chess = Chess()
-chess.printChess()
+        print()
+
+    def possible_move(self):
+        moves = []
+        for i in range(8):
+            for j in range(8):
+                if(self.chess[i][j] == None): continue
+                if self.playerTurn == self.chess[i][j],team:
+                    for move in self.chess[i][j].possibleMove():
+                        moves.append(move)
+        return moves
+
+
+    def getPlayerTurn(self):
+        return self.playerTurn
+    
+    def getCurrentBoard(self):
+        return self.chess
+    
+
 # chess.chess[0][1].move((5,3))
 # chess.chess[0][2].move((5,3))
 # chess.chess[0][3].move((5,3))
