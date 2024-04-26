@@ -52,11 +52,13 @@ class Piece:
             if(self.chess.chess[row][col].team != self.team):
                 return (True,True)
         return (True,False)
-    def move(self,row:int,col:int):
-        self.chess.chess[self.row][self.col] = None
-        self.row = row
-        self.col = col
-        self.chess.chess[self.row][self.col] = self
+    def move(self,row_col):
+        if(type(row_col) is tuple):
+            self.chess.chess[self.row][self.col] = None
+            self.row = row_col[0]
+            self.col = row_col[1]
+            self.chess.chess[self.row][self.col] = self
+        return
     def autoCheck(self, result:list,i,j,indexI,indexJ):
         while -1< i < MAX_ROW and -1< j < MAX_COL:
             posssibleMove = self.checkPossibleMove(i+indexI,j+indexJ)
@@ -117,8 +119,8 @@ class Pawn(Piece):
             if(self.checkCanEat(self.row+1,self.col+1)):
                 result.append((self.row+1,self.col+1))
         return result
-    def move(self,row:int,col:int):
-        super().move(row,col)
+    def move(self,row_col):
+        super().move(row_col)
         self.firstMove = False
 class Knight(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
@@ -153,6 +155,7 @@ class Bishop(Piece):
 class Rook(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
+        self.firstMove = True
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,0)
@@ -160,9 +163,19 @@ class Rook(Piece):
         self.autoCheck(result,self.row,self.col,0,1)
         self.autoCheck(result,self.row,self.col,0,-1)
         return unique(result)
-class Queen(Piece):
+    def move(self,row_col):
+        super().move(row_col)
+        self.firstMove = False
+class Vua(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
+        self.firstMove = True
+    def autoCheck(self, result:list,i,j,indexI,indexJ):
+        posssibleMove = self.checkPossibleMove(i+indexI,j+indexJ)
+        if(type(posssibleMove)==tuple):
+            if(posssibleMove[0]==True):
+                result.append((i+indexI,j+indexJ))
+        return result
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,1)
@@ -173,16 +186,41 @@ class Queen(Piece):
         self.autoCheck(result,self.row,self.col,-1,0)
         self.autoCheck(result,self.row,self.col,0,1)
         self.autoCheck(result,self.row,self.col,0,-1)
+        ###########################
+        if(self.firstMove):
+            self.Castle(result,0)
+            self.Castle(result,7)
         return unique(result)
-class King(Piece):
+    def move(self,row_col):
+        if(type(row_col) is tuple):
+            if(type(row_col[0]) is int):
+                self.chess.chess[self.row][self.col] = None
+                self.row = row_col[0]
+                self.col = row_col[1]
+                self.chess.chess[self.row][self.col] = self
+            else:
+                row_col[0](row_col[1])
+        self.firstMove = False
+        return
+    def Castle(self,col):
+        print("Nhap thanh " + (self.row,self.col) + " " +  col)
+    def checkCastle(self,result:list, col: int):
+        if(self.chess.chess[self.row][col] == None):
+            return
+        if(self.chess.chess[self.row][col].firstMove):
+            if(self.col > col):
+                for i in range(col+1,self.col):
+                    if(self.chess.chess[self.row][i] != None):
+                        return
+            else:
+                for i in range(self.col+1,col):
+                    if(self.chess.chess[self.row][i] != None):
+                        return
+        result.append((self.Castle, col))
+        return result
+class Queen(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
-    def autoCheck(self, result:list,i,j,indexI,indexJ):
-        posssibleMove = self.checkPossibleMove(i+indexI,j+indexJ)
-        if(type(posssibleMove)==tuple):
-            if(posssibleMove[0]==True):
-                result.append((i+indexI,j+indexJ))
-        return result
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,1)
@@ -209,7 +247,7 @@ class Chess:
         self.addChess(Knight(Team.BLACK),0,1)
         self.addChess(Bishop(Team.BLACK),0,2)
         self.addChess(Queen(Team.BLACK),0,3)
-        self.addChess(King(Team.BLACK),0,4)
+        self.addChess(Vua(Team.BLACK),0,4)
         self.addChess(Bishop(Team.BLACK),0,5)
         self.addChess(Knight(Team.BLACK),0,6)
         self.addChess(Rook(Team.BLACK),0,7)
@@ -227,7 +265,7 @@ class Chess:
         self.addChess(Knight(Team.WHITE),7,1)
         self.addChess(Bishop(Team.WHITE),7,2)
         self.addChess(Queen(Team.WHITE),7,3)
-        self.addChess(King(Team.WHITE),7,4)
+        self.addChess(Vua(Team.WHITE),7,4)
         self.addChess(Bishop(Team.WHITE),7,5)
         self.addChess(Knight(Team.WHITE),7,6)
         self.addChess(Rook(Team.WHITE),7,7)
@@ -258,7 +296,16 @@ class Chess:
                     print("___", end=" ", flush=True)
             print()
 chess = Chess()
-chess.printChess()
-# chess.chess[0][1].move(5,3)
 # chess.printChess()
-# print(chess.chess[5][3].possibleMove())
+# chess.chess[0][1].move((5,3))
+# chess.chess[0][2].move((5,3))
+# chess.chess[0][3].move((5,3))
+# chess.chess[0][5].move((5,3))
+# chess.chess[0][6].move((5,3))
+# chess.chess[7][1].move((5,3))
+# chess.chess[7][2].move((5,3))
+# chess.chess[7][3].move((5,3))
+# chess.chess[7][5].move((5,3))
+# chess.chess[7][6].move((5,3))
+chess.printChess()
+print(chess.chess[7][4].possibleMove())
