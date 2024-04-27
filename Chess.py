@@ -1,5 +1,6 @@
 from enum import Enum
 from agent import Agent
+from AssetsCfg import *
 MAX_ROW =8
 MAX_COL =8
 def unique(needList : list):
@@ -8,11 +9,13 @@ def unique(needList : list):
         if i not in result:
             result.append(i)
     return result
+def GetWorldPosition(row:int,col:int):
+    return (OFFSET[0]+(MARGIN + WIDTH) * col + MARGIN, OFFSET[1]+(MARGIN + HEIGHT) * row + MARGIN)
 class Chess:
     pass
 class CellValue(Enum):
     WHITE = 0
-    BLACK = 1
+    GREEN= 1
 class Team(Enum):
     WHITE = 0
     BLACK = 1
@@ -22,6 +25,7 @@ class Cell:
         self.value = value
         self.row = row
         self.col = col
+        self.position = GetWorldPosition(row,col)
 class Board:
     def __init__(self):
         # Color for the board
@@ -32,7 +36,7 @@ class Board:
                 if((i+j)%2 ==0):
                     self.board[i].append(Cell(CellValue.WHITE, i, j))
                 else:
-                    self.board[i].append(Cell(CellValue.BLACK, i, j))
+                    self.board[i].append(Cell(CellValue.GREEN, i, j))
 class Piece:
     def __init__(self, team: Team, chess: Chess = None, row=None, col=None):
         self.team = team
@@ -81,6 +85,10 @@ class Pawn(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
         self.firstMove = True
+        if(self.team == Team.BLACK):
+            self.sprite = green_pawn
+        else:
+            self.sprite = white_pawn
     def checkPossibleMove(self,row:int,col:int):
         if(col > 7 or col < 0):
             return False
@@ -128,6 +136,10 @@ class Pawn(Piece):
 class Knight(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
+        if(self.team == Team.BLACK):
+            self.sprite = green_knight
+        else:
+            self.sprite = white_knight
     def checkAndAppend(self,result:list,row:int,col:int):
         posssibleMove = self.checkPossibleMove(row,col)
         if(type(posssibleMove)==tuple):
@@ -148,6 +160,10 @@ class Knight(Piece):
 class Bishop(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
+        if(self.team == Team.BLACK):
+            self.sprite = green_bishop
+        else:
+            self.sprite = white_bishop
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,1)
@@ -159,6 +175,10 @@ class Rook(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
         self.firstMove = True
+        if(self.team == Team.BLACK):
+            self.sprite = green_rook
+        else:
+            self.sprite = white_rook
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,0)
@@ -173,6 +193,10 @@ class King(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
         self.firstMove = True
+        if(self.team == Team.BLACK):
+            self.sprite = green_king
+        else:
+            self.sprite = white_king
     def autoCheck(self, result:list,i,j,indexI,indexJ):
         posssibleMove = self.checkPossibleMove(i+indexI,j+indexJ)
         if(type(posssibleMove)==tuple):
@@ -229,6 +253,10 @@ class King(Piece):
 class Queen(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
+        if(self.team == Team.BLACK):
+            self.sprite = green_queen
+        else:
+            self.sprite = white_queen
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,1)
