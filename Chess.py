@@ -246,8 +246,10 @@ class Chess:
         self.initChess()
         self.board = Board()
         self.playerTurn = 0
-        self.player0 = player0 #player who use white chess
-        self.player1 = player1 #player who use black chess
+        self.player0 = player0 # player who use white chess
+        self.player1 = player1 # player who use black chess
+        self.result = None # the result of the game
+        self.game_over = False # game is still ongoing
     def initChess(self):
         self.chess = []
         for i in range(8):
@@ -314,7 +316,7 @@ class Chess:
         for i in range(8):
             for j in range(8):
                 if(self.chess[i][j] == None): continue
-                if self.playerTurn == self.chess[i][j],team:
+                if self.playerTurn == self.chess[i][j].team:
                     for move in self.chess[i][j].possibleMove():
                         moves.append(move)
         return moves

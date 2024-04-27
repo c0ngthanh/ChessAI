@@ -1,6 +1,8 @@
 from collections import deque
 import random
 import math
+import copy
+
 class Agent:
     def __init__(self, team):
         self.team = team
@@ -43,7 +45,7 @@ class MCTSNode:
 
     def not_fully_expanded(self) -> bool:
         # check if node has been fully expanded
-        return len(self.children) < len(self.state.possible_move())
+        return len(self.children) < len(self.chess.possible_move())
     
     def ucb1(self, exploration_constant:float) -> float:
         if self.visits == 0:
@@ -63,7 +65,7 @@ class AgentMCTS(Agent):
     def set_current_node(self, chess):
         # set current node to the one similar to the given chess
         for child in self.current_node.children:
-            if child.state == chess:
+            if child.chess == chess:
                 self.current_node = child
                 return
         
@@ -84,7 +86,52 @@ class AgentMCTS(Agent):
             if self.depth_limit and depth >= self.depth_limit:
                 return node
             
+            children = node.children
+            children = [child for child in children if child.alpha <= node.beta]
+            if len(children) == 0:
+                return node
+            node = max(children, key = lambda x: x.ucb1(self.exploration_constant))
+            depth += 1
+        return node
+    
+    def _expand(self, node:MCTSNode) -> MCTSNode:
+        next_chess = copy.deepcopy(node.chess)
+        try:
+            next_chess.play_random_move()
+        except Checkmate:
+            return node
+        new_node = MCTSNode(next_chess, parent = node, alpha=node.alpha, beta = node.beta, move  = None)
+        node.children.append(new_node)
+        return new_node
+    
+    def _simulation(self, node:MCTSNode) -> int:
+        chess = copy.deepcopy(node.chess)
+        while not chess.game_over:
+            try:
+                chess.play_random_move()
+            except Checkmate:
+                return chess.result
+        return chess.result
+    
+    def _backpropagate(self, node: MCTSNode, result: int):
+        while node is not None:
+            node.visits+=1
+            node.wins+=result
+            node = node.parent
   
-    def mcts(board):
-        pass
+    def selectMove(self, chess):
+        self.set_current_node(chess)
+
+        for _ in range(self.interations):
+            node = self._selection(self.current_node, 0)
+            try:
+                if node.not_fully_expanded():
+                    node = self._expand()
+            except Exception: 
+                pass
+            result = self._simulation(node)
+            self._backpropagate(node, result)
+        best_child = max(self.current_node.children, key = lambda x: x.ucb1(self.exploration_constant))
+        self.current_node = best_child
+        return best_child.move
 
