@@ -1,5 +1,5 @@
 from enum import Enum
-from agent import Agent
+from agent import Agent, AgentRandom
 MAX_ROW =8
 MAX_COL =8
 def unique(needList : list):
@@ -55,12 +55,21 @@ class Piece:
             if(self.chess.chess[row][col].team != self.team):
                 return (True,True)
         return (True,False)
+    def getOpponentsTeamList(self):
+        if(self.team == Team.WHITE):
+            return self.chess.black_List
+        else:
+            return self.chess.white_List
     def move(self,row_col):
         if(type(row_col) is tuple):
+            if(self.chess.chess[self.row][self.col] != None):
+                res : list = self.getOpponentsTeamList()
+                res.remove(self.chess.chess[row_col[0]][row_col[1]])
             self.chess.chess[self.row][self.col] = None
             self.row = row_col[0]
             self.col = row_col[1]
             self.chess.chess[self.row][self.col] = self
+            self.chess.checkAfterMove()
         return
     def autoCheck(self, result:list,i,j,indexI,indexJ):
         while -1< i < MAX_ROW and -1< j < MAX_COL:
@@ -122,6 +131,15 @@ class Pawn(Piece):
             if(self.checkCanEat(self.row+1,self.col+1)):
                 result.append((self.row+1,self.col+1))
         return result
+    def possibleEat(self):
+        result = []
+        if(self.team == Team.WHITE):
+            result.append((self.row-1,self.col-1))
+            result.append((self.row-1,self.col+1))
+        elif(self.team == Team.BLACK):
+            result.append((self.row+1,self.col-1))
+            result.append((self.row+1,self.col+1))
+        return result
     def move(self,row_col):
         super().move(row_col)
         self.firstMove = False
@@ -173,11 +191,35 @@ class King(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
         self.firstMove = True
+        self.check = False
     def autoCheck(self, result:list,i,j,indexI,indexJ):
         posssibleMove = self.checkPossibleMove(i+indexI,j+indexJ)
         if(type(posssibleMove)==tuple):
             if(posssibleMove[0]==True):
                 result.append((i+indexI,j+indexJ))
+        return result
+    def checkKingPossibleMove(self,result:list):
+        opponentsList : list = self.getOpponentsTeamList()
+        self.check = False
+        for i in opponentsList:
+            if(type(i) == King):
+                continue
+            if(type(i) == Pawn):
+                if(len(i.possibleEat()) != 0):
+                    for j in result:
+                        if j in i.possibleEat():
+                            result.remove(j)
+                    if (self.row,self.col) in i.possibleEat():
+                        self.check = True
+                        print("CHIẾU " + str(i.row) + " " + str(i.col))
+            else:
+                if(len(i.possibleMove()) != 0):
+                    for j in result:
+                        if j in i.possibleMove():
+                            result.remove(j)
+                    if (self.row,self.col) in i.possibleMove():
+                        self.check = True
+                        print("CHIẾU " + str(i.row) + " " + str(i.col))
         return result
     def possibleMove(self):
         result = []
@@ -193,10 +235,15 @@ class King(Piece):
         if(self.firstMove):
             self.checkCastle(result,0)
             self.checkCastle(result,7)
-        return unique(result)
+        result = unique(result)
+        result = self.checkKingPossibleMove(result)
+        return result
     def move(self,row_col):
         if(type(row_col) is tuple):
             if(type(row_col[0]) is int):
+                if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
+                    res : list = super().getOpponentsTeamList()
+                    res.remove(self.chess.chess[row_col[0]][row_col[1]])
                 self.chess.chess[self.row][self.col] = None
                 self.row = row_col[0]
                 self.col = row_col[1]
@@ -204,6 +251,7 @@ class King(Piece):
             else:
                 row_col[0](row_col[1])
         self.firstMove = False
+        self.chess.checkAfterMove()
         return
     def Castle(self,col):
         if(col == 0):
@@ -241,8 +289,9 @@ class Queen(Piece):
         self.autoCheck(result,self.row,self.col,0,-1)
         return unique(result)
 class Chess:
-    
     def __init__(self, player0: Agent, player1: Agent):
+        self.black_List = []
+        self.white_List = []
         self.initChess()
         self.board = Board()
         self.playerTurn = 0
@@ -250,6 +299,8 @@ class Chess:
         self.player1 = player1 # player who use black chess
         self.result = None # the result of the game
         self.game_over = False # game is still ongoing
+        self.white_King : King = self.chess[7][4]
+        self.black_King : King = self.chess[0][4]
     def initChess(self):
         self.chess = []
         for i in range(8):
@@ -293,11 +344,17 @@ class Chess:
         self.addChess(Pawn(Team.WHITE),6,6)
         self.addChess(Pawn(Team.WHITE),6,7)
     def addChess(self, piece: Piece, row: int, col:int):
-        piece
         self.chess[row][col] = piece
         piece.row = row
         piece.col = col
         piece.chess = self
+        if(piece.team == Team.WHITE):
+            self.white_List.append(piece)
+        elif(piece.team == Team.BLACK):
+            self.black_List.append(piece)
+    def checkAfterMove(self):
+        self.black_King.possibleMove()     
+        self.white_King.possibleMove()     
     def printChess(self):
         for i in range(8):
             for j in range(8):
@@ -328,9 +385,13 @@ class Chess:
     def getCurrentBoard(self):
         return self.chess
     
-
-# chess.chess[0][1].move((5,3))
-# chess.chess[0][2].move((5,3))
+player0 = AgentRandom(Team.WHITE)
+player1 = AgentRandom(Team.BLACK)
+game = Chess(player0, player1)
+game.printChess()
+game.black_King.move((6,0))
+print(game.black_King.possibleMove())
+game.printChess()
 # chess.chess[0][3].move((5,3))
 # chess.chess[0][5].move((5,3))
 # chess.chess[0][6].move((5,3))
