@@ -19,6 +19,10 @@ class CellValue(Enum):
 class Team(Enum):
     WHITE = 0
     BLACK = 1
+class GameResult(Enum):
+    WIN = 0
+    LOSE = 1
+    DRAW = 2
 # Cell and Board for draw game, dont touch
 class Cell:
     def __init__(self, value: CellValue, row: int, col: int):
@@ -216,6 +220,7 @@ class King(Piece):
             self.sprite = green_king
         else:
             self.sprite = white_king
+        self.gameResult = None
     def autoCheck(self, result:list,i,j,indexI,indexJ):
         posssibleMove = self.checkPossibleMove(i+indexI,j+indexJ)
         if(type(posssibleMove)==tuple):
@@ -234,16 +239,16 @@ class King(Piece):
                         if j in i.possibleEat():
                             result.remove(j)
                     if (self.row,self.col) in i.possibleEat():
+                        print("CHIEU NE")
                         self.check = True
-                        print("CHIẾU " + str(i.row) + " " + str(i.col))
             else:
                 if(len(i.possibleMove()) != 0):
                     for j in result:
                         if j in i.possibleMove():
                             result.remove(j)
                     if (self.row,self.col) in i.possibleMove():
+                        print("CHIEU NE")
                         self.check = True
-                        print("CHIẾU " + str(i.row) + " " + str(i.col))
         return result
     def possibleMove(self):
         result = []
@@ -261,6 +266,12 @@ class King(Piece):
             self.checkCastle(result,7)
         result = unique(result)
         result = self.checkKingPossibleMove(result)
+        if(result == [] and self.check):
+            self.gameResult = GameResult.LOSE
+            if(self.team == Team.BLACK):
+                self.chess.white_King.gameResult = GameResult.WIN
+            else:
+                self.chess.black_King.gameResult = GameResult.WIN
         return result
     def move(self,row_col):
         if(type(row_col) is tuple):
@@ -382,7 +393,7 @@ class Chess:
             self.black_List.append(piece)
     def checkAfterMove(self):
         self.black_King.possibleMove()     
-        self.white_King.possibleMove()     
+        self.white_King.possibleMove()
     def printChess(self):
         for i in range(8):
             for j in range(8):
