@@ -424,13 +424,13 @@ class Chess:
     def getCurrentBoard(self):
         return self.chess
     
-player0 = AgentRandom(Team.WHITE)
-player1 = AgentRandom(Team.BLACK)
-game = Chess(player0, player1)
-game.printChess()
-game.black_King.move((6,0))
-print(game.black_King.possibleMove())
-game.printChess()
+# player0 = AgentRandom(Team.WHITE)
+# player1 = AgentRandom(Team.BLACK)
+# game = Chess(player0, player1)
+# game.printChess()
+# game.black_King.move((6,0))
+# print(game.black_King.possibleMove())
+# game.printChess()
 # chess.chess[0][3].move((5,3))
 # chess.chess[0][5].move((5,3))
 # chess.chess[0][6].move((5,3))
