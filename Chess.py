@@ -1,6 +1,9 @@
 from enum import Enum
-from agent import Agent, AgentRandom
+from Enums import *
+from agent import Agent
 from AssetsCfg import *
+from Checkmate import Checkmate
+import random
 MAX_ROW =8
 MAX_COL =8
 def unique(needList : list):
@@ -16,13 +19,7 @@ class Chess:
 class CellValue(Enum):
     WHITE = 0
     GREEN= 1
-class Team(Enum):
-    WHITE = 0
-    BLACK = 1
-class GameResult(Enum):
-    WIN = 0
-    LOSE = 1
-    DRAW = 2
+
 # Cell and Board for draw game, dont touch
 class Cell:
     def __init__(self, value: CellValue, row: int, col: int):
@@ -241,6 +238,7 @@ class King(Piece):
                     if (self.row,self.col) in i.possibleEat():
                         print("CHIEU NE")
                         self.check = True
+                        raise Checkmate(f'{self.team} checkmate')
             else:
                 if(len(i.possibleMove()) != 0):
                     for j in result:
@@ -249,6 +247,7 @@ class King(Piece):
                     if (self.row,self.col) in i.possibleMove():
                         print("CHIEU NE")
                         self.check = True
+                        raise Checkmate(f'{self.team} checkmate')
         return result
     def possibleMove(self):
         result = []
@@ -267,11 +266,11 @@ class King(Piece):
         result = unique(result)
         result = self.checkKingPossibleMove(result)
         if(result == [] and self.check):
-            self.gameResult = GameResult.LOSE
+            self.gameResult = GameResult.WHITELOSE
             if(self.team == Team.BLACK):
-                self.chess.white_King.gameResult = GameResult.WIN
+                self.chess.white_King.gameResult = GameResult.WHITEWIN
             else:
-                self.chess.black_King.gameResult = GameResult.WIN
+                self.chess.black_King.gameResult = GameResult.WHITEWIN
         return result
     def move(self,row_col):
         if(type(row_col) is tuple):
@@ -328,18 +327,20 @@ class Queen(Piece):
         self.autoCheck(result,self.row,self.col,0,-1)
         return unique(result)
 class Chess:
-    def __init__(self, player0: Agent, player1: Agent):
+    def __init__(self):
         self.black_List = []
         self.white_List = []
         self.initChess()
         self.board = Board()
-        self.playerTurn = 0
-        self.player0 = player0 # player who use white chess
-        self.player1 = player1 # player who use black chess
+        self.playerTurn = Team.WHITE #white move first
         self.result = None # the result of the game
         self.game_over = False # game is still ongoing
         self.white_King : King = self.chess[7][4]
         self.black_King : King = self.chess[0][4]
+        # if (player0.__class__.__name__ == 'AgentMCTS'):
+        #     player0.init_root(self.chess)
+        # if (player1.__class__.__name__ == 'AgentMCTS'):
+        #     player1.init_root(self.chess)
     def initChess(self):
         self.chess = []
         for i in range(8):
@@ -423,6 +424,35 @@ class Chess:
     
     def getCurrentBoard(self):
         return self.chess
+    
+    def changeTurn(self):
+        self.playerTurn = Team.WHITE if self.playerTurn == Team.BLACK else Team.BLACK
+
+    def isGameOver(self):
+        return self.game_over
+    
+    def makeRandomMove(self):
+        flag = True
+        while flag:
+            # choose a random piece
+            i = random.randint(0,7)
+            j = random.randint(0,7)
+            if(self.chess[i][j] == None): continue
+            if self.chess[i][j].team != self.playerTurn: continue
+            candidateMove = self.chess[i][j].possibleMove()
+            
+
+            # choose a random possible move
+            if (candidateMove != []):
+                selectedMove = random.choice(candidateMove)
+                print(selectedMove)
+                self.chess[i][j].move(selectedMove)
+                flag= False
+            
+            #change turn
+            self.changeTurn()
+    
+
     
 # player0 = AgentRandom(Team.WHITE)
 # player1 = AgentRandom(Team.BLACK)

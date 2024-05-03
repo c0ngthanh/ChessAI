@@ -9,7 +9,7 @@ class ChessGame():
         self.FPS = 120
         self.fpsClock = pygame.time.Clock()
         self.DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-        pygame.display.set_caption('Light UP Game')
+        pygame.display.set_caption('Chess Game')
         # BACKGROUND = pygame.image.load('tent_game/Assets/bg.png')
         # BACKGROUND = pygame.transform.scale(BACKGROUND, (WINDOWWIDTH, WINDOWHEIGHT))
         # self.font = pygame.font.Font('arial.ttf', 20)

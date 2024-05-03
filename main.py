@@ -4,24 +4,27 @@ from agent import *
 
 def terminate(board):
     pass
-
+ 
 def simulate():
+    game = Chess()
     player0 = AgentRandom(Team.WHITE)
-    player1 = AgentRandom(Team.BLACK)
 
-    game = Chess(player0, player1)
-    for _ in range(1):
-        currentState = game.getCurrentBoard()
-        game.printChess()
+    # iterations = 2, 5 or 10
+    player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
+    
+    for _ in range(2):
         
         # if terminate(currentState):
         #     print('Player %d win', game.getPlayerID)
         #     return
         
-        if game.getPlayerTurn() == 0:
-            game.player0.randomMove(currentState)
-
+        if game.getPlayerTurn() == Team.WHITE:
+            player0.makeMove(game)
+        if game.getPlayerTurn() == Team.BLACK:
+            player1.makeMove(game)
+            
         game.printChess()
+        game.changeTurn()
         
 
 if __name__ == "__main__":
