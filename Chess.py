@@ -70,7 +70,7 @@ class Piece:
             return self.chess.white_List
     def move(self,row_col):
         if(type(row_col) is tuple):
-            if(self.chess.chess[self.row][self.col] != None):
+            if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
                 res : list = self.getOpponentsTeamList()
                 res.remove(self.chess.chess[row_col[0]][row_col[1]])
             self.chess.chess[self.row][self.col] = None
