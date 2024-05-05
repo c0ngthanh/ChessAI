@@ -46,6 +46,7 @@ class Chess:
         self.game_over = False # game is still ongoing
         self.white_King : King = self.chess[7][4]
         self.black_King : King = self.chess[0][4]
+        self.history = []
         # if (player0.__class__.__name__ == 'AgentMCTS'):
         #     player0.init_root(self.chess)
         # if (player1.__class__.__name__ == 'AgentMCTS'):
@@ -142,6 +143,7 @@ class Chess:
     
     def makeRandomMove(self):
         flag = True
+        x, y, i, j = 0, 0, 0, 0
         while flag:
             # choose a random piece
             i = random.randint(0,7)
@@ -154,12 +156,15 @@ class Chess:
             # choose a random possible move
             if (candidateMove != []):
                 selectedMove = random.choice(candidateMove)
-                print(selectedMove)
+                x, y = selectedMove
                 self.chess[i][j].move(selectedMove)
                 flag= False
             
-            #change turn
-            self.changeTurn()
+        #change turn
+        self.changeTurn()
+        
+        #update history
+        self.history.append((i, j, x, y))
     
     
 # player0 = AgentRandom(Team.WHITE)

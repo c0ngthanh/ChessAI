@@ -83,6 +83,8 @@ class AgentMCTS(Agent):
         for child in self.current_node.children:
             if child.chess == chess:
                 self.current_node = child
+                print('set current node')
+                self.current_node.chess.printChess()
                 return
         
         queue = deque([self.root])
@@ -90,10 +92,15 @@ class AgentMCTS(Agent):
             node = queue.popleft()
             if node.chess == chess and node != self.root and node != self.current_node:
                 self.current_node = node
+                print('set current node 2')
+                self.current_node.chess.printChess()
                 return
             queue.extend(node.children)
+
         if not self.current_node.chess == chess:
             self.current_node= MCTSNode(chess)
+            print('set current node 3')
+            self.current_node.chess.printChess()
 
     def _selection(self, node:MCTSNode, depth: int):
         while not node.chess.isGameOver(): #if game is not over yet
@@ -104,7 +111,6 @@ class AgentMCTS(Agent):
             if self.depth_limit and depth >= self.depth_limit:
                 return node
             
-
             children = node.children
             children = [child for child in children if child.alpha <= node.beta]
             if len(children) == 0:
@@ -119,13 +125,13 @@ class AgentMCTS(Agent):
             next_chess.makeRandomMove()
         except Checkmate:
             return node
-        new_node = MCTSNode(next_chess, parent = node, alpha=node.alpha, beta = node.beta, move  = None)
+        new_node = MCTSNode(next_chess, parent = node, alpha=node.alpha, beta = node.beta, move  = next_chess.history[-1])
         node.children.append(new_node)
         return new_node
     
     def _simulation(self, node:MCTSNode) -> int:
-        
-        copychess = node.chess
+        print('simulation')
+        copychess = copy.deepcopy(node.chess)
         while not copychess.game_over:
             try:
                 copychess.makeRandomMove()
@@ -149,19 +155,23 @@ class AgentMCTS(Agent):
   
     def makeMove(self, chess):
         self.set_current_node(chess)
-        print('set_current_node')
-
+        
         for _ in range(self.interations):
             node = self._selection(self.current_node, 0)
-            
+            result = 0
             try:
                 if node.not_fully_expanded():
                     node = self._expand()
             except Exception: 
                 pass
-            result = self._simulation(node)
+
+            try:
+                result = self._simulation(node)
+
+            except Exception: 
+                pass
             self._backpropagate(node, result)
         best_child = max(self.current_node.children, key = lambda x: x.ucb1(self.exploration_constant), default=0)
-        self.current_node = best_child
-        return best_child.move
+        if (type(best_child) is not int):
+            print(best_child.move)
 

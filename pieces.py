@@ -212,8 +212,8 @@ class King(Piece):
                         if j in i.possibleEat():
                             result.remove(j)
                     if (self.row,self.col) in i.possibleEat():
-                        print("CHIEU NE")
                         self.check = True
+                        self.chess.game_over = True
                         raise Checkmate(f'{self.team} checkmate')
             else:
                 if(len(i.possibleMove()) != 0):
@@ -221,8 +221,8 @@ class King(Piece):
                         if j in i.possibleMove():
                             result.remove(j)
                     if (self.row,self.col) in i.possibleMove():
-                        print("CHIEU NE")
                         self.check = True
+                        self.chess.game_over = True
                         raise Checkmate(f'{self.team} checkmate')
         return result
     def possibleMove(self):

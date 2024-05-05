@@ -12,7 +12,7 @@ def simulate():
     # iterations = 2, 5 or 10
     player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
     
-    for _ in range(2):
+    for i in range(2):
         
         # if terminate(currentState):
         #     print('Player %d win', game.getPlayerID)
@@ -22,7 +22,8 @@ def simulate():
             player0.makeMove(game)
         if game.getPlayerTurn() == Team.BLACK:
             player1.makeMove(game)
-            
+        
+        print('Turn: ', i)
         game.printChess()
         game.changeTurn()
         
