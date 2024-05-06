@@ -83,8 +83,7 @@ class Pawn(Piece):
         if(row > 7 or row < 0):
             return False
         if(self.chess.chess[row][col] != None):
-            if(self.chess.chess[row][col].team == self.team):
-                return False
+            return False   
         return True
     def checkCanEat(self,row:int,col:int):
         if(col > 7 or col < 0):
