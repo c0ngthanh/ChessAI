@@ -10,8 +10,7 @@ MAX_COL =8
 
 def GetWorldPosition(row:int,col:int):
     return (OFFSET[0]+(MARGIN + WIDTH) * col + MARGIN, OFFSET[1]+(MARGIN + HEIGHT) * row + MARGIN)
-class Chess:
-    pass
+
 class CellValue(Enum):
     WHITE = 0
     GREEN= 1
@@ -169,7 +168,8 @@ class Chess:
     
 # player0 = AgentRandom(Team.WHITE)
 # player1 = AgentRandom(Team.BLACK)
-# game = Chess(player0, player1)
+game = Chess()
+print(type(game.chess[0][0]) == Rook)
 # game.printChess()
 # game.black_King.move((6,0))
 # print(game.black_King.possibleMove())

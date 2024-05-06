@@ -4,6 +4,8 @@ from agent import Agent
 from AssetsCfg import *
 from Checkmate import Checkmate
 import random
+# from Chess import *
+
 
 MAX_ROW =8
 MAX_COL =8
@@ -242,11 +244,18 @@ class King(Piece):
         result = unique(result)
         result = self.checkKingPossibleMove(result)
         if(result == [] and self.check):
-            self.gameResult = GameResult.WHITELOSE
             if(self.team == Team.BLACK):
                 self.chess.white_King.gameResult = GameResult.WHITEWIN
+                self.chess.black_King.gameResult = GameResult.WHITELOSE
+                self.chess.game_over = True
             else:
+                self.chess.white_King.gameResult = GameResult.WHITELOSE
                 self.chess.black_King.gameResult = GameResult.WHITEWIN
+                self.chess.game_over = True
+        elif(result == [] and not self.check):
+            self.chess.game_over = True
+            self.chess.white_King.gameResult = GameResult.DRAW
+            self.chess.black_King.gameResult = GameResult.DRAW
         return result
     def move(self,row_col):
         if(type(row_col) is tuple):
