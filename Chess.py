@@ -164,28 +164,3 @@ class Chess:
         
         #update history
         self.history.append((i, j, x, y))
-    
-    
-# player0 = AgentRandom(Team.WHITE)
-# player1 = AgentRandom(Team.BLACK)
-game = Chess()
-print(type(game.chess[0][0]) == Rook)
-# game.printChess()
-# game.black_King.move((6,0))
-# print(game.black_King.possibleMove())
-# game.printChess()
-# chess.chess[0][3].move((5,3))
-# chess.chess[0][5].move((5,3))
-# chess.chess[0][6].move((5,3))
-# chess.chess[7][1].move((5,3))
-# chess.chess[7][2].move((5,3))
-# chess.chess[7][3].move((5,3))
-# chess.chess[7][5].move((5,3))
-# chess.chess[7][6].move((5,3))
-# # chess.printChess()
-# a = chess.chess[7][4].possibleMove()
-# # print(chess.chess[7][4].possibleMove())
-# chess.chess[7][4].move(a[3])
-# chess.printChess()
-# print(chess.chess[7][6].possibleMove())
-

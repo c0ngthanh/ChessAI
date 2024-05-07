@@ -43,6 +43,11 @@ class Piece:
             return self.chess.black_List
         else:
             return self.chess.white_List
+    def getOurTeamList(self):
+        if(self.team == Team.BLACK):
+            return self.chess.black_List
+        else:
+            return self.chess.white_List
     def move(self,row_col):
         if(type(row_col) is tuple):
             if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
@@ -254,9 +259,18 @@ class King(Piece):
                 self.chess.game_over = True
                 raise Checkmate(f'{self.team} checkmate')
         elif(result == [] and not self.check):
-            self.chess.game_over = True
-            self.chess.white_King.gameResult = GameResult.DRAW
-            self.chess.black_King.gameResult = GameResult.DRAW
+            canMove = False
+            ourTeam : list = self.getOurTeamList()
+            for i in ourTeam:
+                if type(i) == King:
+                    continue
+                if i.possibleMove() != []:
+                    canMove = True
+                    break
+            if not canMove:
+                self.chess.game_over = True
+                self.chess.white_King.gameResult = GameResult.DRAW
+                self.chess.black_King.gameResult = GameResult.DRAW
         return result
     def move(self,row_col):
         if(type(row_col) is tuple):

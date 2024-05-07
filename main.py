@@ -22,7 +22,7 @@ def simulate(game:Chess):
         player0.makeMove(game)
     if game.getPlayerTurn() == Team.BLACK:
         player1.makeMove(game)
-    
+    print(game.game_over)
     # print('Turn: ', i)
     game.printChess()
     game.changeTurn()
@@ -50,6 +50,6 @@ def simulate2(game:Chess):
         game.printChess()
         game.changeTurn()
 
-chess= Chess()
-simulate2(chess)
+# chess= Chess()
+# simulate2(chess)
         
