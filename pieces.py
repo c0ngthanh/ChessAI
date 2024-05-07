@@ -247,10 +247,12 @@ class King(Piece):
                 self.chess.white_King.gameResult = GameResult.WHITEWIN
                 self.chess.black_King.gameResult = GameResult.WHITELOSE
                 self.chess.game_over = True
+                raise Checkmate(f'{self.team} checkmate')
             else:
                 self.chess.white_King.gameResult = GameResult.WHITELOSE
                 self.chess.black_King.gameResult = GameResult.WHITEWIN
                 self.chess.game_over = True
+                raise Checkmate(f'{self.team} checkmate')
         elif(result == [] and not self.check):
             self.chess.game_over = True
             self.chess.white_King.gameResult = GameResult.DRAW
