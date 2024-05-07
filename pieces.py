@@ -214,8 +214,8 @@ class King(Piece):
                             result.remove(j)
                     if (self.row,self.col) in i.possibleEat():
                         self.check = True
-                        self.chess.game_over = True
-                        raise Checkmate(f'{self.team} checkmate')
+                        # self.chess.game_over = True
+                        # raise Checkmate(f'{self.team} checkmate')
             else:
                 if(len(i.possibleMove()) != 0):
                     for j in result:
@@ -223,8 +223,8 @@ class King(Piece):
                             result.remove(j)
                     if (self.row,self.col) in i.possibleMove():
                         self.check = True
-                        self.chess.game_over = True
-                        raise Checkmate(f'{self.team} checkmate')
+                        # self.chess.game_over = True
+                        # raise Checkmate(f'{self.team} checkmate')
         return result
     def possibleMove(self):
         result = []
