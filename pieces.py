@@ -51,6 +51,9 @@ class Piece:
     def move(self,row_col):
         if(type(row_col) is tuple):
             if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
+                if(type(self.chess.chess[row_col[0]][row_col[1]]) == King):
+                    self.chess.SetGameOver(self.team)
+                    raise Checkmate(f'{self.team} checkmate')
                 res : list = self.getOpponentsTeamList()
                 res.remove(self.chess.chess[row_col[0]][row_col[1]])
             self.chess.chess[self.row][self.col] = None
@@ -248,16 +251,8 @@ class King(Piece):
         result = unique(result)
         result = self.checkKingPossibleMove(result)
         if(result == [] and self.check):
-            if(self.team == Team.BLACK):
-                self.chess.white_King.gameResult = GameResult.WHITEWIN
-                self.chess.black_King.gameResult = GameResult.WHITELOSE
-                self.chess.game_over = True
-                raise Checkmate(f'{self.team} checkmate')
-            else:
-                self.chess.white_King.gameResult = GameResult.WHITELOSE
-                self.chess.black_King.gameResult = GameResult.WHITEWIN
-                self.chess.game_over = True
-                raise Checkmate(f'{self.team} checkmate')
+            self.chess.SetGameOver(self.team)
+            raise Checkmate(f'{self.team} checkmate')
         elif(result == [] and not self.check):
             canMove = False
             ourTeam : list = self.getOurTeamList()
@@ -268,14 +263,15 @@ class King(Piece):
                     canMove = True
                     break
             if not canMove:
-                self.chess.game_over = True
-                self.chess.white_King.gameResult = GameResult.DRAW
-                self.chess.black_King.gameResult = GameResult.DRAW
+                self.chess.SetGameOver()
         return result
     def move(self,row_col):
         if(type(row_col) is tuple):
             if(type(row_col[0]) is int):
                 if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
+                    if(type(self.chess.chess[row_col[0]][row_col[1]]) == King):
+                        self.chess.SetGameOver(self.team)
+                        raise Checkmate(f'{self.team} checkmate')
                     res : list = super().getOpponentsTeamList()
                     res.remove(self.chess.chess[row_col[0]][row_col[1]])
                 self.chess.chess[self.row][self.col] = None
@@ -295,7 +291,7 @@ class King(Piece):
             self.move((self.row,self.col+2))
             self.chess.chess[self.row][col].move((self.row,self.col-1))
     def checkCastle(self,result:list, col: int):
-        if(self.chess.chess[self.row][col] == None):
+        if(self.chess.chess[self.row][col] == None or type(self.chess.chess[self.row][col]) != Rook):
             return
         if(self.chess.chess[self.row][col].firstMove):
             if(self.col > col):

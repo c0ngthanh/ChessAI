@@ -104,6 +104,17 @@ class Chess:
     def checkAfterMove(self):
         self.black_King.possibleMove()     
         self.white_King.possibleMove()
+    def SetGameOver(self, team: Team = None):
+        self.game_over = True 
+        if team == None:
+            self.white_King.gameResult = GameResult.DRAW
+            self.black_King.gameResult = GameResult.DRAW
+        elif team == Team.WHITE:
+            self.white_King.gameResult = GameResult.WHITELOSE
+            self.black_King.gameResult = GameResult.WHITEWIN
+        elif team == Team.BLACK:
+            self.white_King.gameResult = GameResult.WHITEWIN
+            self.black_King.gameResult = GameResult.WHITELOSE
     def printChess(self):
         for i in range(8):
             for j in range(8):
