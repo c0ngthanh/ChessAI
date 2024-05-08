@@ -116,12 +116,12 @@ class Chess:
         elif team == Team.WHITE:
             # self.white_King.gameResult = GameResult.WHITELOSE
             # self.black_King.gameResult = GameResult.WHITEWIN
-            self.result = GameResult.WHITEWIN
+            self.result = GameResult.WHITELOSE
             
         elif team == Team.BLACK:
             # self.white_King.gameResult = GameResult.WHITEWIN
             # self.black_King.gameResult = GameResult.WHITELOSE
-            self.result = GameResult.WHITELOSE
+            self.result = GameResult.WHITEWIN
     def printChess(self):
         for i in range(8):
             for j in range(8):

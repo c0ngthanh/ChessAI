@@ -7,10 +7,10 @@ def terminate(board):
  
 def simulate(game:Chess):
     player0 = AgentRandom(Team.WHITE)
-    player1 = AgentRandom(Team.BLACK)
+    # player1 = AgentRandom(Team.BLACK)
 
     # iterations = 2, 5 or 10
-    # player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
+    player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
     
     # for i in range(2):
         
@@ -22,7 +22,7 @@ def simulate(game:Chess):
         player0.makeMove(game)
     if game.getPlayerTurn() == Team.BLACK:
         player1.makeMove(game)
-    print(game.game_over)
+    # print(game.game_over)
     # print('Turn: ', i)
     game.printChess()
     game.changeTurn()
@@ -34,7 +34,7 @@ def simulate2(game:Chess):
     # player1 = AgentRandom(Team.BLACK)
 
     # iterations = 2, 5 or 10
-    player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
+    player1 = AgentMCTS(team=Team.BLACK, iterations= 5, depth_limit= None, chess = game)
     
     step_lim = 10000
     step = 0
@@ -57,8 +57,8 @@ def simulate2(game:Chess):
 # for _ in range(10):
 #     chess= Chess()
 #     simulate2(chess)
-#     print(chess.result)
+#     print(chess.result)   
 
-chess= Chess()
-simulate2(chess)
-print(chess.result)
+# chess= Chess()
+# simulate2(chess)
+# print(chess.result)

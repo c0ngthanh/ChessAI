@@ -1,7 +1,7 @@
 from enum import Enum
 from Enums import *
 from agent import Agent
-# from AssetsCfg import *
+from AssetsCfg import *
 from Config import *
 from Checkmate import Checkmate
 import random
@@ -53,7 +53,7 @@ class Piece:
         if(type(row_col) is tuple):
             if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
                 if(type(self.chess.chess[row_col[0]][row_col[1]]) == King):
-                    self.chess.SetGameOver(self.team)
+                    self.chess.SetGameOver(self.chess.chess[row_col[0]][row_col[1]].team)
                     # raise Checkmate(f'{self.team} checkmate')
                 res : list = self.getOpponentsTeamList()
                 res.remove(self.chess.chess[row_col[0]][row_col[1]])
@@ -82,10 +82,10 @@ class Pawn(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
         self.firstMove = True
-        # if(self.team == Team.BLACK):
-        #     self.sprite = green_pawn
-        # else:
-        #     self.sprite = white_pawn
+        if(self.team == Team.BLACK):
+            self.sprite = green_pawn
+        else:
+            self.sprite = white_pawn
     def checkPossibleMove(self,row:int,col:int):
         if(col > 7 or col < 0):
             return False
@@ -141,10 +141,10 @@ class Pawn(Piece):
 class Knight(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
-        # if(self.team == Team.BLACK):
-        #     self.sprite = green_knight  
-        # else:
-        #     self.sprite = white_knight
+        if(self.team == Team.BLACK):
+            self.sprite = green_knight  
+        else:
+            self.sprite = white_knight
     def checkAndAppend(self,result:list,row:int,col:int):
         posssibleMove = self.checkPossibleMove(row,col)
         if(type(posssibleMove)==tuple):
@@ -165,10 +165,10 @@ class Knight(Piece):
 class Bishop(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
-        # if(self.team == Team.BLACK):
-        #     self.sprite = green_bishop
-        # else:
-        #     self.sprite = white_bishop
+        if(self.team == Team.BLACK):
+            self.sprite = green_bishop
+        else:
+            self.sprite = white_bishop
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,1)
@@ -180,10 +180,10 @@ class Rook(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
         self.firstMove = True
-        # if(self.team == Team.BLACK):
-        #     self.sprite = green_rook
-        # else:
-        #     self.sprite = white_rook
+        if(self.team == Team.BLACK):
+            self.sprite = green_rook
+        else:
+            self.sprite = white_rook
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,0)
@@ -199,10 +199,12 @@ class King(Piece):
         super().__init__(team, chess, row, col)
         self.firstMove = True
         self.check = False
-        # if(self.team == Team.BLACK):
-        #     self.sprite = green_king
-        # else:
-        #     self.sprite = white_king
+        self.isCheck : Piece = None
+        self.help = []
+        if(self.team == Team.BLACK):
+            self.sprite = green_king
+        else:
+            self.sprite = white_king
         self.gameResult = None
     def autoCheck(self, result:list,i,j,indexI,indexJ):
         posssibleMove = self.checkPossibleMove(i+indexI,j+indexJ)
@@ -210,9 +212,29 @@ class King(Piece):
             if(posssibleMove[0]==True):
                 result.append((i+indexI,j+indexJ))
         return result
+    def GetCellBetweenCheckAndKing(self):
+        # Tính toán các ô giữa thằng chiếu và vua
+        result = []
+        if(type(self.isCheck) == Knight):
+            result.append((self.isCheck.row,self.isCheck.col))
+        if(self.col == self.isCheck.col):
+            a = range(self.isCheck.row,self.row) if  self.isCheck.row<self.row else range(self.row+1,self.isCheck.row+1)
+            for i in a:
+                result.append((i,self.col))
+        elif(self.row == self.isCheck.row):
+            a = range(self.isCheck.col,self.col) if  self.isCheck.col<self.col else range(self.col+1,self.isCheck.col+1)
+            for i in a:
+                result.append((self.row,i))
+        else:
+            a = self.row - self.isCheck.row
+            b = self.col - self.isCheck.col
+            for i in range(1,abs(a)+1):
+                result.append((self.row + i*a/abs(a),self.col + i*b/abs(b)))
+        return result
     def checkKingPossibleMove(self,result:list):
         opponentsList : list = self.getOpponentsTeamList()
         self.check = False
+        self.isCheck = None
         for i in opponentsList:
             if(type(i) == King):
                 continue
@@ -223,6 +245,7 @@ class King(Piece):
                             result.remove(j)
                     if (self.row,self.col) in i.possibleEat():
                         self.check = True
+                        self.isCheck = i
                         # self.chess.game_over = True
                         # raise Checkmate(f'{self.team} checkmate')
             else:
@@ -232,11 +255,13 @@ class King(Piece):
                             result.remove(j)
                     if (self.row,self.col) in i.possibleMove():
                         self.check = True
+                        self.isCheck = i
                         # self.chess.game_over = True
                         # raise Checkmate(f'{self.team} checkmate')
         return result
     def possibleMove(self):
         result = []
+        self.help = []
         self.autoCheck(result,self.row,self.col,1,1)
         self.autoCheck(result,self.row,self.col,1,-1)
         self.autoCheck(result,self.row,self.col,-1,1)
@@ -252,7 +277,19 @@ class King(Piece):
         result = unique(result)
         result = self.checkKingPossibleMove(result)
         if(result == [] and self.check):
-            self.chess.SetGameOver(self.team)
+            gameOver = True
+            ourTeam : list = self.getOurTeamList()
+            moveList = self.GetCellBetweenCheckAndKing()
+            for i in ourTeam:
+                if type(i) == King:
+                    continue
+                for j in moveList:
+                    if j in i.possibleMove():
+                        gameOver = False
+                        # (i,j) tuple i Piece , j (row,colum)
+                        self.help.append((i,j))
+            if(gameOver):
+                self.chess.SetGameOver(self.team)
             # raise Checkmate(f'{self.team} checkmate')
         elif(result == [] and not self.check):
             canMove = False
@@ -271,7 +308,7 @@ class King(Piece):
             if(type(row_col[0]) is int):
                 if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
                     if(type(self.chess.chess[row_col[0]][row_col[1]]) == King):
-                        self.chess.SetGameOver(self.team)
+                        self.chess.SetGameOver(self.chess.chess[row_col[0]][row_col[1]].team)
                         # raise Checkmate(f'{self.team} checkmate')
                     res : list = super().getOpponentsTeamList()
                     res.remove(self.chess.chess[row_col[0]][row_col[1]])
@@ -308,10 +345,10 @@ class King(Piece):
 class Queen(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
-        # if(self.team == Team.BLACK):
-        #     self.sprite = green_queen
-        # else:
-        #     self.sprite = white_queen
+        if(self.team == Team.BLACK):
+            self.sprite = green_queen
+        else:
+            self.sprite = white_queen
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,1)
