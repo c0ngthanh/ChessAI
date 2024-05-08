@@ -166,23 +166,50 @@ class Chess:
         return self.game_over
     
     def makeRandomMove(self):
-        flag = True
-        x, y, i, j = 0, 0, 0, 0
-        while flag:
-            # choose a random piece
-            i = random.randint(0,7)
-            j = random.randint(0,7)
-            if(self.chess[i][j] == None): continue
-            if self.chess[i][j].team != self.playerTurn: continue
-            candidateMove = self.chess[i][j].possibleMove()
-            
+        #make random and legal move, not completely random
+        chess_list = []
+        king = None
+        i,j,x,y = 0,0,0,0
+        if(self.playerTurn == Team.WHITE):
+            chess_list = self.white_List
+            king = self.white_King
+        else:
+            chess_list = self.black_List
+            king = self.black_King
 
-            # choose a random possible move
-            if (candidateMove != []):
-                selectedMove = random.choice(candidateMove)
-                x, y = selectedMove
-                self.chess[i][j].move(selectedMove)
-                flag= False
+        # if king is checked, protected its at all cost
+        if king.check == True:
+            help_move_list = king.help #call for help from other pieces
+            if (help_move_list == []): #king move its self to avoid check mate
+                # print('king move to protect itself')
+                help_move_list = king.possibleMove()
+                if help_move_list == []: raise Checkmate('Lose')
+                move = random.choice(help_move_list)
+                i, j = king.getPos()
+                x, y = move
+                king.move(move)
+            else: 
+                # print('other piece move to protect king')
+                chosen_help_move = random.choice(help_move_list)
+                chess, pos = chosen_help_move
+                i, j = chess.getPos()
+                x, y = pos
+                x = int(x)
+                y = int(y)
+                chess.move((x,y))
+        else: 
+            flag = True
+            while flag:
+                chosen_chess = random.choice(chess_list)
+                candidateMove = chosen_chess.possibleMove()
+                # choose a random possible move
+                if (candidateMove != []):
+                    selectedMove = random.choice(candidateMove)
+                    # print(selectedMove)
+                    i, j = chosen_chess.getPos()
+                    x, y = selectedMove
+                    chosen_chess.move(selectedMove)
+                    flag = False
             
         #change turn
         self.changeTurn()

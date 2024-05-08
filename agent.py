@@ -21,22 +21,20 @@ class AgentRandom(Agent):
         Agent.__init__(self,team)
 
     def makeMove(self, game):
-        chess = game.getCurrentBoard()
+        chess_list = []
+        if self.team == Team.WHITE:
+            chess_list  = game.white_List
+        else:
+            chess_list = game.black_List
         flag = True
         while flag:
-            # choose a random piece
-            i = random.randint(0,7)
-            j = random.randint(0,7)
-            if(chess[i][j] == None): continue
-            if chess[i][j].team != self.team: continue
-            candidateMove = chess[i][j].possibleMove()
-            
-
+            chosen_chess = random.choice(chess_list)
+            candidateMove = chosen_chess.possibleMove()
             # choose a random possible move
             if (candidateMove != []):
                 selectedMove = random.choice(candidateMove)
                 # print(selectedMove)
-                chess[i][j].move(selectedMove)
+                chosen_chess.move(selectedMove)
                 flag= False
 
 
@@ -206,6 +204,6 @@ class AgentMCTS(Agent):
         # if (type(best_child) is not int):
         #     print(best_child.move)
         i, j, x, y = best_child.move
-
+        print(i,j,x,y)
         chess.chess[i][j].move((x,y))
 

@@ -23,6 +23,8 @@ def simulate(game:Chess):
     if game.getPlayerTurn() == Team.BLACK:
         player1.makeMove(game)
     # print(game.game_over)
+    if game.game_over: 
+        print(game.result)
     # print('Turn: ', i)
     game.printChess()
     game.changeTurn()
@@ -34,9 +36,9 @@ def simulate2(game:Chess):
     # player1 = AgentRandom(Team.BLACK)
 
     # iterations = 2, 5 or 10
-    player1 = AgentMCTS(team=Team.BLACK, iterations= 5, depth_limit= None, chess = game)
+    player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
     
-    step_lim = 10000
+    step_lim = 1000
     step = 0
     while not game.game_over and step < step_lim:  
         # if terminate(currentState):
@@ -59,6 +61,6 @@ def simulate2(game:Chess):
 #     simulate2(chess)
 #     print(chess.result)   
 
-# chess= Chess()
-# simulate2(chess)
-# print(chess.result)
+chess= Chess()
+simulate2(chess)
+print(chess.result)

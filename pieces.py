@@ -24,6 +24,8 @@ class Piece:
         self.col = col
         self.chess = chess
 
+    def getPos(self):
+        return self.row,self.col
     
     def possibleMove(self):
         print("Nothing")
@@ -276,7 +278,7 @@ class King(Piece):
             self.checkCastle(result,7)
         result = unique(result)
         result = self.checkKingPossibleMove(result)
-        if(result == [] and self.check):
+        if(self.check):
             gameOver = True
             ourTeam : list = self.getOurTeamList()
             moveList = self.GetCellBetweenCheckAndKing()
@@ -288,7 +290,7 @@ class King(Piece):
                         gameOver = False
                         # (i,j) tuple i Piece , j (row,colum)
                         self.help.append((i,j))
-            if(gameOver):
+            if(gameOver and result == []):
                 self.chess.SetGameOver(self.team)
             # raise Checkmate(f'{self.team} checkmate')
         elif(result == [] and not self.check):
