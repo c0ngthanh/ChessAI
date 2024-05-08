@@ -1,6 +1,7 @@
 from collections import deque
 import random
 import math
+from copy import deepcopy
 import copy
 from Checkmate import Checkmate
 from Enums import *
@@ -34,7 +35,7 @@ class AgentRandom(Agent):
             # choose a random possible move
             if (candidateMove != []):
                 selectedMove = random.choice(candidateMove)
-                print(selectedMove)
+                # print(selectedMove)
                 chess[i][j].move(selectedMove)
                 flag= False
 
@@ -61,6 +62,9 @@ class MCTSNode:
     
     def setChess(self,chess):
         self.chess = chess
+
+    def getChildLen(self):
+        return len(self.children)
 
 class AgentMCTS(Agent):
     def __init__(self, chess, team, iterations: int, depth_limit: int, exploration_constant: float = math.sqrt(2)):
@@ -92,14 +96,14 @@ class AgentMCTS(Agent):
             node = queue.popleft()
             if node.chess == chess and node != self.root and node != self.current_node:
                 self.current_node = node
-                print('set current node 2')
+                # print('set current node 2')
                 self.current_node.chess.printChess()
                 return
             queue.extend(node.children)
 
         if not self.current_node.chess == chess:
             self.current_node= MCTSNode(chess)
-            print('set current node 3')
+            # print('set current node 3')
             self.current_node.chess.printChess()
 
     def _selection(self, node:MCTSNode, depth: int):
@@ -120,39 +124,45 @@ class AgentMCTS(Agent):
         return node
     
     def _expand(self, node:MCTSNode) -> MCTSNode:
-        next_chess = node.chess
+        # next_chess = node.chess.__deepcopy__()
+        next_chess = copy.deepcopy(node.chess)
         try:
             next_chess.makeRandomMove()
+            # print('rand move:')
+            # next_chess.printChess()
         except Checkmate:
             return node
-        new_node = MCTSNode(next_chess, parent = node, alpha=node.alpha, beta = node.beta, move  = next_chess.history[-1])
+        new_node = MCTSNode(node.chess, parent = node, alpha=node.alpha, beta = node.beta, move  = next_chess.history[-1])
         node.children.append(new_node)
         return new_node
     
     def _simulation(self, node:MCTSNode) -> int:
-        print('simulation1')
-        copychess = node.chess
-        print('hello', copychess.game_over)
+        # print('simulation1')
+        # copychess = node.chess.__deepcopy__()
+        copychess = copy.deepcopy(node.chess)
+        # print('hello', copychess.game_over)
         while not copychess.game_over:
             try:
-                print('make random move')
+                # print('make random move')
                 copychess.makeRandomMove()
             except Checkmate:
-                print('result1', copychess.result)
+                # print('result1', copychess.result)
                 return copychess.result
-        print('result2', copychess.result)
+            
+        # for i in range(10):
+        #     try:
+        #         # print('make random move')
+        #         copychess.makeRandomMove()
+        #     except Checkmate:
+        #         print('result1', copychess.result)
+        #         return copychess.result
+        # print('result1', copychess.result)
         return copychess.result
     
-    def _backpropagate(self, node: MCTSNode, result: GameResult):
+    def _backpropagate(self, node: MCTSNode, score: int):
         # score = 0.5 if draw, score = 1 if win and 0 if lose
         
-        score = 0
-        if result == GameResult.DRAW:
-            score = 0.5
-        if result == GameResult.WHITEWIN and self.team == Team.WHITE:
-            score = 1
-        if result == GameResult.WHITELOSE and self.team == Team.BLACK:
-            score = 1
+        # print('score', score)
         while node is not None:
             node.visits+=1
             node.wins+=score
@@ -160,28 +170,42 @@ class AgentMCTS(Agent):
             
   
     def makeMove(self, chess):
+        # print('print before make move')
+        # chess.printChess()
         self.set_current_node(chess)
         
-        for _ in range(self.interations):
+        for i in range(self.interations):
             node = self._selection(self.current_node, 0)
             # print('asdasd:')
             # node.chess.printChess()
             result = 0
-            try:
-                if node.not_fully_expanded():
-                    node = self._expand()
-            except Exception: 
-                pass
+            # try:
+            #     if node.not_fully_expanded():
+            #         print('expand')
+            #         node = self._expand(node)
 
-            try:
-                result = self._simulation(node)
+            # except Exception: 
+            #     pass
+            if node.not_fully_expanded():
+                    # print('expand')
+                    node = self._expand(node)
 
-            except Exception: 
-                pass
-            self._backpropagate(node, result)
+            result = self._simulation(node)
+            score = 0
+            if result == GameResult.DRAW:
+                score = 0.5
+            if result == GameResult.WHITEWIN and self.team == Team.WHITE:
+                score = 1
+            if result == GameResult.WHITELOSE and self.team == Team.BLACK:
+                score = 1
+
+            self._backpropagate(node, score)
         if(self.current_node.children == []):
             print('empty list')
         best_child = max(self.current_node.children, key = lambda x: x.ucb1(self.exploration_constant), default=0)
-        if (type(best_child) is not int):
-            print(best_child.move)
+        # if (type(best_child) is not int):
+        #     print(best_child.move)
+        i, j, x, y = best_child.move
+
+        chess.chess[i][j].move((x,y))
 

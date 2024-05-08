@@ -1,12 +1,13 @@
 from enum import Enum
 from Enums import *
 from agent import Agent
-from AssetsCfg import *
+# from AssetsCfg import *
+from Config import *
 from Checkmate import Checkmate
 from pieces import *
 import random
-MAX_ROW =8
-MAX_COL =8
+import copy
+MAX_COL = 8
 
 def GetWorldPosition(row:int,col:int):
     return (OFFSET[0]+(MARGIN + WIDTH) * col + MARGIN, OFFSET[1]+(MARGIN + HEIGHT) * row + MARGIN)
@@ -105,24 +106,37 @@ class Chess:
         self.black_King.possibleMove()     
         self.white_King.possibleMove()
     def SetGameOver(self, team: Team = None):
+        # required team win, if not team = None, result - draw
         self.game_over = True 
         if team == None:
-            self.white_King.gameResult = GameResult.DRAW
-            self.black_King.gameResult = GameResult.DRAW
+            # self.white_King.gameResult = GameResult.DRAW
+            # self.black_King.gameResult = GameResult.DRAW
+            self.result = GameResult.DRAW
+            
         elif team == Team.WHITE:
-            self.white_King.gameResult = GameResult.WHITELOSE
-            self.black_King.gameResult = GameResult.WHITEWIN
+            # self.white_King.gameResult = GameResult.WHITELOSE
+            # self.black_King.gameResult = GameResult.WHITEWIN
+            self.result = GameResult.WHITEWIN
+            
         elif team == Team.BLACK:
-            self.white_King.gameResult = GameResult.WHITEWIN
-            self.black_King.gameResult = GameResult.WHITELOSE
+            # self.white_King.gameResult = GameResult.WHITEWIN
+            # self.black_King.gameResult = GameResult.WHITELOSE
+            self.result = GameResult.WHITELOSE
     def printChess(self):
         for i in range(8):
             for j in range(8):
-                if(self.chess[i][j]!= None):
-                    if(self.chess[i][j].team == Team.WHITE):
-                        print(self.chess[i][j].__class__.__name__[0]+"_W", end=" ", flush=True)
+                chess_obj = self.chess[i][j]
+                if(chess_obj!= None):
+                    if chess_obj.__class__.__name__ == 'King':
+                        if(chess_obj.team == Team.WHITE):
+                            print("V_W", end=" ", flush=True)
+                        else:
+                            print("V_B", end=" ", flush=True)
                     else:
-                        print(self.chess[i][j].__class__.__name__[0]+"_B", end=" ", flush=True)
+                        if(chess_obj.team == Team.WHITE):
+                            print(chess_obj.__class__.__name__[0] +"_W", end=" ", flush=True)
+                        else:
+                            print(chess_obj.__class__.__name__[0]+"_B", end=" ", flush=True)
                 else:
                     print("___", end=" ", flush=True)
             print()
@@ -175,3 +189,23 @@ class Chess:
         
         #update history
         self.history.append((i, j, x, y))
+
+    def makeMoveFromTuple(self, move: tuple):
+        print('move', move)
+        i,j,x,y = move
+        self.chess[i][j].move((x,y))
+        #change turn
+
+    def __deepcopy1__(self):
+        deep = Chess()
+        deep.black_List = copy.deepcopy(self.black_List)
+        deep.white_List = self.white_List 
+        deep.chess = self.chess
+        deep.board = self.board 
+        deep.playerTurn = self.playerTurn 
+        deep.result = self.result
+        deep.game_over = self.game_over
+        deep.white_King = self.white_King 
+        deep.black_King = self.black_King 
+        deep.history = self.history
+        return deep

@@ -1,7 +1,8 @@
 from enum import Enum
 from Enums import *
 from agent import Agent
-from AssetsCfg import *
+# from AssetsCfg import *
+from Config import *
 from Checkmate import Checkmate
 import random
 # from Chess import *
@@ -53,7 +54,7 @@ class Piece:
             if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
                 if(type(self.chess.chess[row_col[0]][row_col[1]]) == King):
                     self.chess.SetGameOver(self.team)
-                    raise Checkmate(f'{self.team} checkmate')
+                    # raise Checkmate(f'{self.team} checkmate')
                 res : list = self.getOpponentsTeamList()
                 res.remove(self.chess.chess[row_col[0]][row_col[1]])
             self.chess.chess[self.row][self.col] = None
@@ -81,10 +82,10 @@ class Pawn(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
         self.firstMove = True
-        if(self.team == Team.BLACK):
-            self.sprite = green_pawn
-        else:
-            self.sprite = white_pawn
+        # if(self.team == Team.BLACK):
+        #     self.sprite = green_pawn
+        # else:
+        #     self.sprite = white_pawn
     def checkPossibleMove(self,row:int,col:int):
         if(col > 7 or col < 0):
             return False
@@ -140,10 +141,10 @@ class Pawn(Piece):
 class Knight(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
-        if(self.team == Team.BLACK):
-            self.sprite = green_knight
-        else:
-            self.sprite = white_knight
+        # if(self.team == Team.BLACK):
+        #     self.sprite = green_knight  
+        # else:
+        #     self.sprite = white_knight
     def checkAndAppend(self,result:list,row:int,col:int):
         posssibleMove = self.checkPossibleMove(row,col)
         if(type(posssibleMove)==tuple):
@@ -164,10 +165,10 @@ class Knight(Piece):
 class Bishop(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
-        if(self.team == Team.BLACK):
-            self.sprite = green_bishop
-        else:
-            self.sprite = white_bishop
+        # if(self.team == Team.BLACK):
+        #     self.sprite = green_bishop
+        # else:
+        #     self.sprite = white_bishop
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,1)
@@ -179,10 +180,10 @@ class Rook(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
         self.firstMove = True
-        if(self.team == Team.BLACK):
-            self.sprite = green_rook
-        else:
-            self.sprite = white_rook
+        # if(self.team == Team.BLACK):
+        #     self.sprite = green_rook
+        # else:
+        #     self.sprite = white_rook
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,0)
@@ -198,10 +199,10 @@ class King(Piece):
         super().__init__(team, chess, row, col)
         self.firstMove = True
         self.check = False
-        if(self.team == Team.BLACK):
-            self.sprite = green_king
-        else:
-            self.sprite = white_king
+        # if(self.team == Team.BLACK):
+        #     self.sprite = green_king
+        # else:
+        #     self.sprite = white_king
         self.gameResult = None
     def autoCheck(self, result:list,i,j,indexI,indexJ):
         posssibleMove = self.checkPossibleMove(i+indexI,j+indexJ)
@@ -252,7 +253,7 @@ class King(Piece):
         result = self.checkKingPossibleMove(result)
         if(result == [] and self.check):
             self.chess.SetGameOver(self.team)
-            raise Checkmate(f'{self.team} checkmate')
+            # raise Checkmate(f'{self.team} checkmate')
         elif(result == [] and not self.check):
             canMove = False
             ourTeam : list = self.getOurTeamList()
@@ -271,7 +272,7 @@ class King(Piece):
                 if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
                     if(type(self.chess.chess[row_col[0]][row_col[1]]) == King):
                         self.chess.SetGameOver(self.team)
-                        raise Checkmate(f'{self.team} checkmate')
+                        # raise Checkmate(f'{self.team} checkmate')
                     res : list = super().getOpponentsTeamList()
                     res.remove(self.chess.chess[row_col[0]][row_col[1]])
                 self.chess.chess[self.row][self.col] = None
@@ -307,10 +308,10 @@ class King(Piece):
 class Queen(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
-        if(self.team == Team.BLACK):
-            self.sprite = green_queen
-        else:
-            self.sprite = white_queen
+        # if(self.team == Team.BLACK):
+        #     self.sprite = green_queen
+        # else:
+        #     self.sprite = white_queen
     def possibleMove(self):
         result = []
         self.autoCheck(result,self.row,self.col,1,1)
