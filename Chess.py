@@ -236,3 +236,12 @@ class Chess:
         deep.black_King = self.black_King 
         deep.history = self.history
         return deep
+# chess = Chess()
+# chess.chess[0][4].move((3,3))
+# chess.chess[7][4].move((3,5))
+# chess.chess[7][4].move((6,3))
+# chess.printChess()
+# chess.changeTurn()
+# print(chess.playerTurn)
+# print(chess.white_King.possibleMove())
+# print(chess.black_King.possibleMove())

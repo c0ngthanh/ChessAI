@@ -285,16 +285,18 @@ class King(Piece):
         else:
             return self.chess.white_King
     def KvsK(self, result):
+        if(self.chess.playerTurn != self.team):
+            return result
         opponentKing = self.GetOpponentKing()
         aroundKing = []
-        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,1,1)
-        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,1,-1)
-        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,-1,1)
-        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,-1,-1)
-        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,1,0)
-        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,-1,0)
-        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,0,1)
-        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,0,-1)
+        opponentKing.autoCheck(aroundKing,opponentKing.row,opponentKing.col,1,1)
+        opponentKing.autoCheck(aroundKing,opponentKing.row,opponentKing.col,1,-1)
+        opponentKing.autoCheck(aroundKing,opponentKing.row,opponentKing.col,-1,1)
+        opponentKing.autoCheck(aroundKing,opponentKing.row,opponentKing.col,-1,-1)
+        opponentKing.autoCheck(aroundKing,opponentKing.row,opponentKing.col,1,0)
+        opponentKing.autoCheck(aroundKing,opponentKing.row,opponentKing.col,-1,0)
+        opponentKing.autoCheck(aroundKing,opponentKing.row,opponentKing.col,0,1)
+        opponentKing.autoCheck(aroundKing,opponentKing.row,opponentKing.col,0,-1)
         for i in result:
             if i in aroundKing:
                 result.remove(i)
@@ -369,12 +371,19 @@ class King(Piece):
         self.chess.checkAfterMove()
         return
     def Castle(self,col):
+        # print("Nhap thanh ")
+        # print(self.team)
+        # print(col)
+        # print(self.possibleMove())
+        # print(self.row,self.col)
+        # print(self.firstCheck,self.firstMove)
         if(col == 0):
             self.move((self.row,self.col-2))
             self.chess.chess[self.row][col].move((self.row,self.col+1))
         elif(col ==7):
             self.move((self.row,self.col+2))
             self.chess.chess[self.row][col].move((self.row,self.col-1))
+        self.firstMove = False
     def checkCastle(self,result:list, col: int):
         if(self.chess.chess[self.row][col] == None or type(self.chess.chess[self.row][col]) != Rook):
             return
@@ -382,12 +391,13 @@ class King(Piece):
             if(self.col > col):
                 for i in range(col+1,self.col):
                     if(self.chess.chess[self.row][i] != None):
-                        return
+                        return result
             else:
                 for i in range(self.col+1,col):
+                    # print(self.chess.chess[self.row][i])
                     if(self.chess.chess[self.row][i] != None):
-                        return
-        result.append((self.Castle, col))
+                        return result
+            result.append((self.Castle, col))
         return result
 class Queen(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
