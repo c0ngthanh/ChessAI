@@ -140,6 +140,15 @@ class Pawn(Piece):
     def move(self,row_col):
         super().move(row_col)
         self.firstMove = False
+        if self.team == Team.WHITE:
+            if(self.row == 0):
+                self.Update(Queen)
+        else:
+            if(self.row == 7):
+                self.Update(Queen)
+    def Update(self, pieceClass):
+        self.getOurTeamList().remove(self)
+        self.chess.addChess(pieceClass(self.team),self.row,self.col)
 class Knight(Piece):
     def __init__(self, team: Team, chess=None, row=None, col=None):
         super().__init__(team, chess, row, col)
@@ -203,6 +212,7 @@ class King(Piece):
         self.check = False
         self.isCheck : Piece = None
         self.help = []
+        self.firstCheck = True
         if(self.team == Team.BLACK):
             self.sprite = green_king
         else:
@@ -245,8 +255,12 @@ class King(Piece):
                     for j in result:
                         if j in i.possibleEat():
                             result.remove(j)
+                        if type(j[0]) != int:
+                            if (self.GetKingPosAfterCastle(j[1])) in i.possibleEat():
+                                result.remove(j)
                     if (self.row,self.col) in i.possibleEat():
                         self.check = True
+                        self.firstCheck = False
                         self.isCheck = i
                         # self.chess.game_over = True
                         # raise Checkmate(f'{self.team} checkmate')
@@ -255,12 +269,41 @@ class King(Piece):
                     for j in result:
                         if j in i.possibleMove():
                             result.remove(j)
+                        if type(j[0]) != int:
+                            if (self.GetKingPosAfterCastle(j[1])) in i.possibleMove():
+                                result.remove(j)
                     if (self.row,self.col) in i.possibleMove():
                         self.check = True
+                        self.firstCheck = False
                         self.isCheck = i
                         # self.chess.game_over = True
                         # raise Checkmate(f'{self.team} checkmate')
         return result
+    def GetOpponentKing(self):
+        if(self.team == Team.WHITE):
+            return self.chess.black_King
+        else:
+            return self.chess.white_King
+    def KvsK(self, result):
+        opponentKing = self.GetOpponentKing()
+        aroundKing = []
+        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,1,1)
+        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,1,-1)
+        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,-1,1)
+        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,-1,-1)
+        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,1,0)
+        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,-1,0)
+        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,0,1)
+        opponentKing.autoCheck(result,opponentKing.row,opponentKing.col,0,-1)
+        for i in result:
+            if i in aroundKing:
+                result.remove(i)
+        return result
+    def GetKingPosAfterCastle(self, col):
+        if col == 0:
+            return (self.row, 2)
+        if col == 7:
+            return (self.row, 6)
     def possibleMove(self):
         result = []
         self.help = []
@@ -273,11 +316,13 @@ class King(Piece):
         self.autoCheck(result,self.row,self.col,0,1)
         self.autoCheck(result,self.row,self.col,0,-1)
         ###########################
-        if(self.firstMove):
+        if self.firstMove and self.firstCheck:
             self.checkCastle(result,0)
             self.checkCastle(result,7)
         result = unique(result)
         result = self.checkKingPossibleMove(result)
+        result = self.KvsK(result)
+
         if(self.check):
             gameOver = True
             ourTeam : list = self.getOurTeamList()

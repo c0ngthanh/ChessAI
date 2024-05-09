@@ -61,6 +61,6 @@ def simulate2(game:Chess):
 #     simulate2(chess)
 #     print(chess.result)   
 
-chess= Chess()
-simulate2(chess)
-print(chess.result)
+# chess= Chess()
+# simulate2(chess)
+# print(chess.result)
