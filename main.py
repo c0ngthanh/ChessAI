@@ -1,16 +1,24 @@
 from Chess import *
 
 from agent import *
+from MinimaxAgent import *
 
 def terminate(board):
     pass
  
 def simulate(game:Chess):
-    player0 = AgentRandom(Team.WHITE)
-    # player1 = AgentRandom(Team.BLACK)
 
-    # iterations = 2, 5 or 10
+    #Minimax
+    player0 = MinimaxAgent(Team.WHITE,3)
+    # player1 = AgentRandom(Team.BLACK)
     player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
+
+
+    # player0 = AgentRandom(Team.WHITE)
+    # # player1 = AgentRandom(Team.BLACK)
+
+    # # iterations = 2, 5 or 10
+    # player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
     
     # for i in range(2):
         
