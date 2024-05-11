@@ -141,6 +141,12 @@ class MinimaxAgent(Agent):
                 for j in range(8):
                     if board[i][j] is None:
                         continue
+                    else:
+                        print(board[i][j])
+                    if type(board[i][j]) == None:
+                        continue
+                    else: 
+                        print(type(board[i][j]))
                     if board[i][j].team != self.team:
                         continue
                     candidateMove = board[i][j].possibleMove()
@@ -161,6 +167,12 @@ class MinimaxAgent(Agent):
                 for j in range(8):
                     if board[i][j] is None:
                         continue
+                    else:
+                        print(board[i][j])
+                    if type(board[i][j]) == None:
+                        continue
+                    else: 
+                        print(type(board[i][j]))
                     if board[i][j].team == self.team:
                         continue
                     candidateMove = board[i][j].possibleMove()
@@ -184,6 +196,7 @@ class MinimaxAgent(Agent):
         current_board = game.getCurrentBoard()
         clone_board = copy.deepcopy(current_board)
         best_move = self.get_move(clone_board)
+        print(best_move)
         current_board[best_move[0]][best_move[1]].move(best_move[2])
         print(f"Move made by MinimaxAgent: ({best_move[0]}, {best_move[1]}) -> ({best_move[2]})"), 
         
