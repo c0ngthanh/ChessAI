@@ -6,11 +6,12 @@ def terminate(board):
     pass
  
 def simulate(game:Chess):
+    print('Turn', game.getPlayerTurn())
     player0 = AgentRandom(Team.WHITE)
     # player1 = AgentRandom(Team.BLACK)
 
     # iterations = 2, 5 or 10
-    player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
+    player1 = AgentMCTS(team=Team.BLACK, iterations= 5, depth_limit= None, chess = game)
     
     # for i in range(2):
         
@@ -18,16 +19,17 @@ def simulate(game:Chess):
     #     print('Player %d win', game.getPlayerID)
     #     return
     
-    if game.getPlayerTurn() == Team.WHITE:
+    if game.getPlayerTurn() == player0.getTeam():
         player0.makeMove(game)
-    if game.getPlayerTurn() == Team.BLACK:
+    else:
         player1.makeMove(game)
+        game.changeTurn()
+
     # print(game.game_over)
     if game.game_over: 
         print(game.result)
     # print('Turn: ', i)
     game.printChess()
-    game.changeTurn()
     return game
 
 
@@ -61,6 +63,6 @@ def simulate2(game:Chess):
 #     simulate2(chess)
 #     print(chess.result)   
 
-# chess= Chess()
-# simulate2(chess)
-# print(chess.result)
+chess= Chess()
+simulate2(chess)
+print(chess.result)

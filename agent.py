@@ -21,21 +21,7 @@ class AgentRandom(Agent):
         Agent.__init__(self,team)
 
     def makeMove(self, game):
-        chess_list = []
-        if self.team == Team.WHITE:
-            chess_list  = game.white_List
-        else:
-            chess_list = game.black_List
-        flag = True
-        while flag:
-            chosen_chess = random.choice(chess_list)
-            candidateMove = chosen_chess.possibleMove()
-            # choose a random possible move
-            if (candidateMove != []):
-                selectedMove = random.choice(candidateMove)
-                # print(selectedMove)
-                chosen_chess.move(selectedMove)
-                flag= False
+        game.makeRandomMove()
 
 
 class MCTSNode:
@@ -95,14 +81,14 @@ class AgentMCTS(Agent):
             if node.chess == chess and node != self.root and node != self.current_node:
                 self.current_node = node
                 # print('set current node 2')
-                self.current_node.chess.printChess()
+                # self.current_node.chess.printChess()
                 return
             queue.extend(node.children)
 
         if not self.current_node.chess == chess:
             self.current_node= MCTSNode(chess)
             # print('set current node 3')
-            self.current_node.chess.printChess()
+            # self.current_node.chess.printChess()
 
     def _selection(self, node:MCTSNode, depth: int):
         while not node.chess.isGameOver(): #if game is not over yet
@@ -177,16 +163,13 @@ class AgentMCTS(Agent):
             # print('asdasd:')
             # node.chess.printChess()
             result = 0
-            # try:
-            #     if node.not_fully_expanded():
-            #         print('expand')
-            #         node = self._expand(node)
-
-            # except Exception: 
-            #     pass
-            if node.not_fully_expanded():
-                    # print('expand')
+            try:
+                if node.not_fully_expanded():
                     node = self._expand(node)
+
+            except Exception: 
+                pass
+
 
             result = self._simulation(node)
             score = 0
@@ -200,7 +183,7 @@ class AgentMCTS(Agent):
             self._backpropagate(node, score)
         if(self.current_node.children == []):
             print('empty list')
-        best_child = max(self.current_node.children, key = lambda x: x.ucb1(self.exploration_constant), default=0)
+        best_child = max(self.current_node.children, key = lambda x: x.ucb1(self.exploration_constant))
         # if (type(best_child) is not int):
         #     print(best_child.move)
         i, j, x, y = best_child.move

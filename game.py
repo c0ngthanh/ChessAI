@@ -17,6 +17,8 @@ class ChessGame():
         pygame.display.set_caption('Chess Game')
         self.chess = Chess()
         self.renderGame()
+        self.player0 = AgentRandom(Team.WHITE)
+        self.player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = self.chess)
     def renderGame(self):
         for row in range(8):
             for column in range(8):
@@ -26,6 +28,22 @@ class ChessGame():
                     self.DISPLAYSURF.blit(white_cell,self.chess.board.board[row][column].position)
                 if(self.chess.chess[row][column] != None):
                     self.DISPLAYSURF.blit(pygame.transform.scale(pygame.image.load(self.chess.chess[row][column].sprite),(WIDTH,HEIGHT)),self.chess.board.board[row][column].position)
+    def simulate(self):
+        print('Turn', self.chess.getPlayerTurn())
+        if self.chess.getPlayerTurn() == self.player0.getTeam():
+            self.player0.makeMove(self.chess)
+            print(self.chess.history[-1])
+            print("hehe")
+        else:
+            self.player1.makeMove(self.chess)
+            self.chess.changeTurn()
+
+        # print(game.game_over)
+        if self.chess.game_over: 
+            print(self.chess.result)
+        # print('Turn: ', i)
+        self.chess.printChess()
+        return self.chess
     def run(self):
         # DISPLAYSURF.blit(BACKGROUND, (0, 0))
         done = False
@@ -35,8 +53,8 @@ class ChessGame():
                 if event.type == pygame.QUIT:  # If user clicked close
                     done = True  # Flag that we are done so we exit this loop
                 # if event.type == pygame.MOUSEBUTTONDOWN:
-                #     self.chess = simulate(self.chess)
-                #     self.renderGame()
+                    # self.chess = simulate(self.chess)
+                    # self.renderGame()
             time.sleep(0.01)
             if not self.chess.game_over:
                 self.chess = simulate(self.chess)

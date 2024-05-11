@@ -251,6 +251,8 @@ class King(Piece):
         for i in opponentsList:
             if(type(i) == King):
                 continue
+            # print(i)
+            # print(i.team)
             if(type(i) == Pawn):
                 if(len(i.possibleEat()) != 0):
                     for j in result:
@@ -284,6 +286,7 @@ class King(Piece):
                         # self.chess.game_over = True
                         # raise Checkmate(f'{self.team} checkmate')
         self.chess.chess[self.row][self.col] = self
+        # print("end")
         return result
     def GetOpponentKing(self):
         if(self.team == Team.WHITE):
@@ -357,6 +360,7 @@ class King(Piece):
                     break
             if not canMove:
                 self.chess.SetGameOver()
+                raise Checkmate("DRAW")
         return result
     def move(self,row_col):
         if(type(row_col) is tuple):
@@ -388,7 +392,7 @@ class King(Piece):
             self.chess.chess[self.row][col].move((self.row,self.col+1))
         elif(col ==7):
             self.move((self.row,self.col+2))
-            self.chess.chess[self.row][col].move((self.row,self.col-1))
+            self.chess.chess[self.row][col].move((self.row,self.col-1)) 
         self.firstMove = False
     def checkCastle(self,result:list, col: int):
         if(self.chess.chess[self.row][col] == None or type(self.chess.chess[self.row][col]) != Rook):

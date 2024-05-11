@@ -122,6 +122,7 @@ class Chess:
             # self.white_King.gameResult = GameResult.WHITEWIN
             # self.black_King.gameResult = GameResult.WHITELOSE
             self.result = GameResult.WHITEWIN
+        raise Checkmate(f'{team} got checkmate')
     def printChess(self):
         for i in range(8):
             for j in range(8):
@@ -237,7 +238,14 @@ class Chess:
         deep.history = self.history
         return deep
 # chess = Chess()
-# # chess.chess[0][4].move((3,3))
+# chess.changeTurn()
+# chess.chess[0][1].move((2,2))
+# chess.chess[1][4].move((3,4))
+# chess.chess[3][4].move((4,4))
+# chess.chess[0][5].move((1,4))
+# chess.chess[2][2].move((4,3))
+# chess.chess[0][6].move((2,7))
+# chess.chess[0][4].Castle(7)
 # chess.chess[7][3].move((2,4))
 # # chess.chess[7][4].move((3,6))
 # # chess.chess[7][4].move((6,3))
