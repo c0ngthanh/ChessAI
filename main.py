@@ -2,6 +2,13 @@ from Chess import *
 
 from agent import *
 from MinimaxAgent import *
+from elo import *
+
+# Agent White elo 
+white_elo = 1000
+# Agent Black elo
+black_elo = 1000
+
 
 def terminate(board):
     pass
@@ -9,9 +16,12 @@ def terminate(board):
 def simulate(game:Chess):
 
     #Minimax
-    player0 = MinimaxAgent(Team.WHITE,1)
-    player1 = AgentRandom(Team.BLACK)
-    # player1 = AgentMCTS(team=Team.BLACK, iterations= 2, depth_limit= None, chess = game)
+    # player0 = MinimaxAgent(Team.WHITE,1)
+    # player1 = AgentRandom(Team.BLACK)
+
+    player0 = AgentRandom(Team.WHITE)
+    player1 = MinimaxAgent(Team.BLACK, 1)
+    
 
 
     # player0 = AgentRandom(Team.WHITE)
@@ -34,8 +44,10 @@ def simulate(game:Chess):
     if game.game_over: 
         print(game.result)
     # print('Turn: ', i)
+
     game.printChess()
     game.changeTurn()
+
     return game
 
 
@@ -62,7 +74,7 @@ def simulate(game:Chess):
 #         game.printChess()
 #         game.changeTurn()
     
-#     # print(chess.result)
+    # print(chess.result)
 
 # for _ in range(10):
 #     chess= Chess()

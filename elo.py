@@ -2,10 +2,8 @@ import math
 
 # Constant K
 K = 25
-# Player elo 
-player_rating = 1200
-# Agent elo
-agent_rating = 1000
+
+result = [1,1,1,1,1,1,1,1,1,1]
 
 # Expected score func
 def expected_score(rating_a, rating_b):
@@ -15,20 +13,20 @@ def expected_score(rating_a, rating_b):
 def update_elo_rating(rating, expected_score, actual_score):
     return rating + K * (actual_score - expected_score)
 
+def elo(agent1_rating, agent2_rating):
+    for i in range(10):
+        # Expected score of player
+        expected1 = expected_score(agent1_rating, agent2_rating)
 
-# Math result for player (1: win, 0.5: draw, 0: lose)
-result = 1
+        # Expected score of agent
+        expected2 = expected_score(agent2_rating, agent1_rating)
 
-# Expected score of player
-expected1 = expected_score(player_rating, agent_rating)
+        # Update elo
+        agent1_rating = update_elo_rating(agent1_rating, expected1, result[i])
+        agent2_rating = update_elo_rating(agent2_rating, expected2, 1 - result[i])
 
-# Expected score of agent
-expected2 = expected_score(agent_rating, player_rating)
+    # In kết quả
+    print("Elo rating agent white:", agent1_rating)
+    print("Elo rating agent black:", agent2_rating)
 
-# Update elo
-player_rating = update_elo_rating(player_rating, expected1, result)
-agent_rating = update_elo_rating(agent_rating, expected2, 1 - result)
-
-# In kết quả
-print("Elo rating player:", player_rating)
-print("Elo rating agent:", agent_rating)
+    return agent1_rating, agent2_rating

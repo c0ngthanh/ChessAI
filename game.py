@@ -31,16 +31,23 @@ class ChessGame():
         done = False
         status = None
         while not done:
-            for event in pygame.event.get():  # User did something
-                if event.type == pygame.QUIT:  # If user clicked close
-                    done = True  # Flag that we are done so we exit this loop
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.chess = simulate(self.chess)
-                    self.renderGame()
-            # time.sleep(0.01)
-            # if not self.chess.game_over:
-                # self.chess = simulate(self.chess)
-                # self.renderGame()
+            # for event in pygame.event.get():  # User did something
+            #     if event.type == pygame.QUIT:  # If user clicked close
+            #         done = True  # Flag that we are done so we exit this loop
+            #     if event.type == pygame.MOUSEBUTTONDOWN:
+            #         self.chess = simulate(self.chess)
+            #         self.renderGame()
+            #         if self.chess.result != None:
+            #             print(self.chess.result)
+            #             done = True
+            time.sleep(0.01)
+            if not self.chess.game_over:
+                self.chess = simulate(self.chess)
+                self.renderGame()
+                if self.chess.result != None:
+                    print(self.chess.result)
+                    done = True
+                # elo(white_elo, black_elo)
             self.fpsClock.tick(self.FPS)
             pygame.display.update()
 chess= ChessGame()
