@@ -21,22 +21,22 @@ class AgentRandom(Agent):
         Agent.__init__(self,team)
 
     def makeMove(self, game):
-        chess_list = []
-        if self.team == Team.WHITE:
-            chess_list  = game.white_List
-        else:
-            chess_list = game.black_List
-        flag = True
-        while flag:
-            chosen_chess = random.choice(chess_list)
-            candidateMove = chosen_chess.possibleMove()
-            # choose a random possible move
-            if (candidateMove != []):
-                selectedMove = random.choice(candidateMove)
-                # print(selectedMove)
-                chosen_chess.move(selectedMove)
-                flag= False
-
+        # chess_list = []
+        # if self.team == Team.WHITE:
+        #     chess_list  = game.white_List
+        # else:
+        #     chess_list = game.black_List
+        # flag = True
+        # while flag:
+        #     chosen_chess = random.choice(chess_list)
+        #     candidateMove = chosen_chess.possibleMove()
+        #     # choose a random possible move
+        #     if (candidateMove != []):
+        #         selectedMove = random.choice(candidateMove)
+        #         # print(selectedMove)
+        #         chosen_chess.move(selectedMove)
+        #         flag= False
+        game.makeRandomMove()
 
 class MCTSNode:
     def __init__(self, chess, parent= None, move= None, alpha = -float("inf"),beta = float("inf")):

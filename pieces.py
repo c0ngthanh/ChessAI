@@ -56,7 +56,7 @@ class Piece:
             if(self.chess.chess[row_col[0]][row_col[1]] != None and self.chess.chess[row_col[0]][row_col[1]].team != self.team):
                 if(type(self.chess.chess[row_col[0]][row_col[1]]) == King):
                     self.chess.SetGameOver(self.chess.chess[row_col[0]][row_col[1]].team)
-                    # raise Checkmate(f'{self.team} checkmate')
+                    raise Checkmate(f'{self.team} checkmate')
                 res : list = self.getOpponentsTeamList()
                 res.remove(self.chess.chess[row_col[0]][row_col[1]])
             self.chess.chess[self.row][self.col] = None
@@ -109,7 +109,7 @@ class Pawn(Piece):
         result = []
         if(self.team == Team.WHITE):
             if(self.firstMove):
-                if(self.checkPossibleMove(self.row-2,self.col)):
+                if(self.checkPossibleMove(self.row-2,self.col) and self.chess.chess[self.row-1][self.col] == None):
                     result.append((self.row-2,self.col))
             if(self.checkPossibleMove(self.row-1,self.col)):
                 result.append((self.row-1,self.col))
@@ -119,7 +119,7 @@ class Pawn(Piece):
                 result.append((self.row-1,self.col+1))
         elif(self.team == Team.BLACK):
             if(self.firstMove):
-                if(self.checkPossibleMove(self.row+2,self.col)):
+                if(self.checkPossibleMove(self.row+2,self.col) and self.chess.chess[self.row+1][self.col] == None):
                     result.append((self.row+2,self.col))
             if(self.checkPossibleMove(self.row+1,self.col)):
                 result.append((self.row+1,self.col))
@@ -229,7 +229,7 @@ class King(Piece):
         result = []
         if(type(self.isCheck) == Knight):
             result.append((self.isCheck.row,self.isCheck.col))
-        if(self.col == self.isCheck.col):
+        elif(self.col == self.isCheck.col):
             a = range(self.isCheck.row,self.row) if  self.isCheck.row<self.row else range(self.row+1,self.isCheck.row+1)
             for i in a:
                 result.append((i,self.col))
@@ -241,9 +241,10 @@ class King(Piece):
             a = self.row - self.isCheck.row
             b = self.col - self.isCheck.col
             for i in range(1,abs(a)+1):
-                result.append((self.row + i*a/abs(a),self.col + i*b/abs(b)))
+                result.append((self.row - i*a/abs(a),self.col - i*b/abs(b)))
         return result
     def checkKingPossibleMove(self,result:list):
+        self.chess.chess[self.row][self.col] = None
         opponentsList : list = self.getOpponentsTeamList()
         self.check = False
         self.isCheck = None
@@ -265,19 +266,24 @@ class King(Piece):
                         # self.chess.game_over = True
                         # raise Checkmate(f'{self.team} checkmate')
             else:
-                if(len(i.possibleMove()) != 0):
+                possmove = i.possibleMove()
+                removeList = []
+                if(len(possmove) != 0):
                     for j in result:
-                        if j in i.possibleMove():
-                            result.remove(j)
+                        if j in possmove:
+                            removeList.append(j)
                         if type(j[0]) != int:
-                            if (self.GetKingPosAfterCastle(j[1])) in i.possibleMove():
+                            if (self.GetKingPosAfterCastle(j[1])) in possmove:
                                 result.remove(j)
-                    if (self.row,self.col) in i.possibleMove():
+                    for j in removeList:
+                        result.remove(j)
+                    if (self.row,self.col) in possmove:
                         self.check = True
                         self.firstCheck = False
                         self.isCheck = i
                         # self.chess.game_over = True
                         # raise Checkmate(f'{self.team} checkmate')
+        self.chess.chess[self.row][self.col] = self
         return result
     def GetOpponentKing(self):
         if(self.team == Team.WHITE):
@@ -339,7 +345,7 @@ class King(Piece):
                         self.help.append((i,j))
             if(gameOver and result == []):
                 self.chess.SetGameOver(self.team)
-            # raise Checkmate(f'{self.team} checkmate')
+                # raise Checkmate(f'{self.team} checkmate')
         elif(result == [] and not self.check):
             canMove = False
             ourTeam : list = self.getOurTeamList()

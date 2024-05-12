@@ -122,6 +122,7 @@ class Chess:
             # self.white_King.gameResult = GameResult.WHITEWIN
             # self.black_King.gameResult = GameResult.WHITELOSE
             self.result = GameResult.WHITEWIN
+        raise Checkmate(f'{team} checkmate')
     def printChess(self):
         for i in range(8):
             for j in range(8):
@@ -212,7 +213,7 @@ class Chess:
                     flag = False
             
         #change turn
-        self.changeTurn()
+        # self.changeTurn()
         
         #update history
         self.history.append((i, j, x, y))
@@ -236,11 +237,15 @@ class Chess:
         deep.black_King = self.black_King 
         deep.history = self.history
         return deep
-# chess = Chess()
-# chess.chess[0][4].move((3,3))
-# chess.chess[7][4].move((3,5))
-# chess.chess[7][4].move((6,3))
-# chess.printChess()
+chess = Chess()
+chess.chess[1][0].move((2,0))
+chess.chess[1][1].move((2,1))
+chess.chess[7][1].move((3,3))
+chess.chess[3][3].move((1,2))
+# chess.chess[7][1].move((5,5))
+# chess.chess[7][1].move((5,4))
+print(chess.game_over)
+chess.printChess()
 # chess.changeTurn()
 # print(chess.playerTurn)
 # print(chess.white_King.possibleMove())

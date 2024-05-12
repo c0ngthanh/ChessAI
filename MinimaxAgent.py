@@ -2,6 +2,8 @@
 
 import random
 import copy
+from Chess import Chess
+from Enums import Team
 from pieces import Pawn, Rook, Knight, Bishop, Queen, King
 
 
@@ -141,18 +143,20 @@ class MinimaxAgent(Agent):
                 for j in range(8):
                     if board[i][j] is None:
                         continue
-                    else:
-                        print(board[i][j])
+                    # else:
+                        # print(board[i][j])
                     if type(board[i][j]) == None:
                         continue
-                    else: 
-                        print(type(board[i][j]))
+                    # else: 
+                        # print(type(board[i][j]))
                     if board[i][j].team != self.team:
                         continue
                     candidateMove = board[i][j].possibleMove()
                     if candidateMove == []:
                         continue
                     for move in candidateMove:
+                        if(type(move[0])!= int):
+                            continue
                         clone_board = copy.deepcopy(board)
                         clone_board[i][j].move(move)
                         eval, _ = self.minimax(clone_board, depth - 1, False)
@@ -167,18 +171,20 @@ class MinimaxAgent(Agent):
                 for j in range(8):
                     if board[i][j] is None:
                         continue
-                    else:
-                        print(board[i][j])
+                    # else:
+                        # print(board[i][j])
                     if type(board[i][j]) == None:
                         continue
-                    else: 
-                        print(type(board[i][j]))
+                    # else: 
+                        # print(type(board[i][j])) 
                     if board[i][j].team == self.team:
                         continue
                     candidateMove = board[i][j].possibleMove()
                     if candidateMove == []:
                         continue
                     for move in candidateMove:
+                        if(type(move[0])!= int):
+                            continue
                         clone_board = copy.deepcopy(board)
                         clone_board[i][j].move(move)
                         eval, _ = self.minimax(clone_board, depth - 1, True)
@@ -191,12 +197,34 @@ class MinimaxAgent(Agent):
     def get_move(self, board):
         _, best_move = self.minimax(board, self.depth, True)
         return best_move
-    
-    def makeMove(self, game):
-        current_board = game.getCurrentBoard()
+    def printChess(self,abc):
+        for i in range(8):
+            for j in range(8):
+                chess_obj = abc[i][j]
+                if(chess_obj!= None):
+                    if chess_obj.__class__.__name__ == 'King':
+                        if(chess_obj.team == Team.WHITE):
+                            print("V_W", end=" ", flush=True)
+                        else:
+                            print("V_B", end=" ", flush=True)
+                    else:
+                        if(chess_obj.team == Team.WHITE):
+                            print(chess_obj.__class__.__name__[0] +"_W", end=" ", flush=True)
+                        else:
+                            print(chess_obj.__class__.__name__[0]+"_B", end=" ", flush=True)
+                else:
+                    print("___", end=" ", flush=True)
+            print()
+        print()
+    def makeMove(self, game: Chess):
+        current_board : Chess = game.getCurrentBoard()
+        # print("Current")
+        # self.printChess(current_board)
         clone_board = copy.deepcopy(current_board)
         best_move = self.get_move(clone_board)
-        print(best_move)
+        # print(best_move)
+        # if(current_board[best_move[0]][best_move[1]] == None):
+            # print("huhu")
         current_board[best_move[0]][best_move[1]].move(best_move[2])
         print(f"Move made by MinimaxAgent: ({best_move[0]}, {best_move[1]}) -> ({best_move[2]})"), 
         
